@@ -11,6 +11,22 @@
 
 A Foundry-based template for developing Solidity smart contracts, with sensible defaults.
 
+## Deployments:
+
+### Sepolia
+
+| Contract Name         | Address                                                                                                                       |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| FUX                   | [0x2da5896b58DFde573d1D3a8FdB88Ca22b371c7e4](https://sepolia.etherscan.io/address/0x2da5896b58DFde573d1D3a8FdB88Ca22b371c7e4) |
+| StrategyRegistry      | [0x77e247f195B8f6AC09a539a5C7BbA3d2F2Fb7A69](https://sepolia.etherscan.io/address/0x77e247f195B8f6AC09a539a5C7BbA3d2F2Fb7A69) |
+| WERKImplementation    | [0x6930E6BBD816aAEf658780D4f36036B79517b389](https://sepolia.etherscan.io/address/0x6930E6BBD816aAEf658780D4f36036B79517b389) |
+| WERKFactory           | [0x43686d0D6EB15c876705309dC4607bF2FB3505C7](https://sepolia.etherscan.io/address/0x43686d0D6EB15c876705309dC4607bF2FB3505C7) |
+| WERKNFT               | [0x5D95eE47D4e6f11F9aB1093A6B5490682259c65D](https://sepolia.etherscan.io/address/0x5D95eE47D4e6f11F9aB1093A6B5490682259c65D) |
+| FUXStaking            | [0x40697C1Cd1A9D1388168e6fd93F3e59B025BdB44](https://sepolia.etherscan.io/address/0x40697C1Cd1A9D1388168e6fd93F3e59B025BdB44) |
+| AllowListCoordination | [0xAA8651F596d5C43A6181C04D21F982a80f4C7937](https://sepolia.etherscan.io/address/0xAA8651F596d5C43A6181C04D21F982a80f4C7937) |
+| SimplePeerEvaluation  | [0xc3728aeB5a64E6457F74EF5bDE15f212bdc7685a](https://sepolia.etherscan.io/address/0xc3728aeB5a64E6457F74EF5bDE15f212bdc7685a) |
+| DirectDeposit         | [0x200465d19DbA364E5622C4E9E661614Ce28f10F1](https://sepolia.etherscan.io/address/0x200465d19DbA364E5622C4E9E661614Ce28f10F1) |
+
 ## What's Inside
 
 - [Forge](https://github.com/foundry-rs/foundry/blob/master/forge): compile, test, fuzz, format, and deploy smart
