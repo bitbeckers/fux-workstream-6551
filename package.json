@@ -29,6 +29,12 @@
   "scripts": {
     "clean": "rm -rf cache out",
     "build": "forge build",
+    "deploy:fux:mock": "forge script script/DeployFUX.s.sol:DeployFUX --fork-url sepolia",
+    "deploy:strat:mock": "forge script script/DeployStrategyRegistry.s.sol:DeployStrategyRegistry --fork-url sepolia",
+    "deploy:werk:mock": "forge script script/DeployWERK.s.sol:DeployWERK --fork-url sepolia",
+    "deploy:fux:sepolia": "forge script script/DeployFUX.s.sol:DeployFUX --broadcast --verify -vvvv --fork-url sepolia",
+    "deploy:strat:sepolia": "forge script script/DeployStrategyRegistry.s.sol:DeployStrategyRegistry --broadcast --verify -vvvv --fork-url sepolia",
+    "deploy:werk:sepolia": "forge script script/DeployWERK.s.sol:DeployWERK --broadcast --verify -vvvv --fork-url sepolia",
     "lint": "bun run lint:sol && bun run prettier:check",
     "lint:sol": "forge fmt --check && bun solhint {script,src,test}/**/*.sol",
     "prettier:check": "prettier --check **/*.{json,md,yml} --ignore-path=.prettierignore",

@@ -10,55 +10,37 @@ import { IStrategyRegistry } from "./interfaces/IStrategyRegistry.sol";
 import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 contract WERKImplementation is IWERK, OwnableUpgradeable {
-    address public immutable strategyRegistry;
-    bytes32 internal commitmentStrategyId;
-    bytes32 internal fundingStrategyId;
-    bytes32 internal evaluationStrategyId;
-    bytes32 internal coordinationStrategyId;
+    address internal commitmentStrategy;
+    address internal coordinationStrategy;
+    address internal evaluationStrategy;
+    address internal fundingStrategy;
     WorkstreamStatus internal status;
 
     /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor(address _strategyRegistry) {
-        strategyRegistry = _strategyRegistry;
+    constructor() {
         _disableInitializers();
     }
 
     // _initializationParams = abi.encode(
     // address _owner,
-    // bytes32 _coordinationStrategyId,
-    // bytes32 _commitmentStrategyId,
-    // bytes32 _evaluationStrategyId,
-    // bytes32 _fundingStrategyId,
+    // address _commitmentStrategy,
+    // address _coordinationStrategy,
+    // address _evaluationStrategy,
+    // address _fundingStrategy,
     // )
     function setUp(bytes memory _initializationParams) public virtual initializer {
         (
             address _owner,
-            bytes32 _coordinationStrategyId,
-            bytes32 _commitmentStrategyId,
-            bytes32 _evaluationStrategyId,
-            bytes32 _fundingStrategyId
-        ) = abi.decode(_initializationParams, (address, bytes32, bytes32, bytes32, bytes32));
+            address _commitmentStrategy,
+            address _coordinationStrategy,
+            address _evaluationStrategy,
+            address _fundingStrategy
+        ) = abi.decode(_initializationParams, (address, address, address, address, address));
 
-        if (!IStrategyRegistry(strategyRegistry).isStrategy(_coordinationStrategyId)) {
-            revert StrategyDoesNotExist();
-        }
-
-        if (!IStrategyRegistry(strategyRegistry).isStrategy(_commitmentStrategyId)) {
-            revert StrategyDoesNotExist();
-        }
-
-        if (!IStrategyRegistry(strategyRegistry).isStrategy(_evaluationStrategyId)) {
-            revert StrategyDoesNotExist();
-        }
-
-        if (!IStrategyRegistry(strategyRegistry).isStrategy(_fundingStrategyId)) {
-            revert StrategyDoesNotExist();
-        }
-
-        commitmentStrategyId = _commitmentStrategyId;
-        coordinationStrategyId = _coordinationStrategyId;
-        evaluationStrategyId = _evaluationStrategyId;
-        fundingStrategyId = _fundingStrategyId;
+        commitmentStrategy = _commitmentStrategy;
+        coordinationStrategy = _coordinationStrategy;
+        evaluationStrategy = _evaluationStrategy;
+        fundingStrategy = _fundingStrategy;
 
         __Ownable_init(_owner);
     }
@@ -66,79 +48,61 @@ contract WERKImplementation is IWERK, OwnableUpgradeable {
     // Coordinate
 
     function addContributors(address[] memory _contributors, bytes memory data) external override {
-        ICoordinate(IStrategyRegistry(strategyRegistry).getStrategy(coordinationStrategyId).implementation)
-            .addContributors(_contributors, data);
+        ICoordinate(coordinationStrategy).addContributors(_contributors, data);
     }
 
     function removeContributors(address[] memory _contributors, bytes memory data) external override {
-        ICoordinate(IStrategyRegistry(strategyRegistry).getStrategy(coordinationStrategyId).implementation)
-            .removeContributors(_contributors, data);
+        ICoordinate(coordinationStrategy).removeContributors(_contributors, data);
     }
 
     function addCoordinators(address[] memory _coordinators, bytes memory data) external override {
-        ICoordinate(IStrategyRegistry(strategyRegistry).getStrategy(coordinationStrategyId).implementation)
-            .addCoordinators(_coordinators, data);
+        ICoordinate(coordinationStrategy).addCoordinators(_coordinators, data);
     }
 
     function removeCoordinators(address[] memory _coordinators, bytes memory data) external override {
-        ICoordinate(IStrategyRegistry(strategyRegistry).getStrategy(coordinationStrategyId).implementation)
-            .removeCoordinators(_coordinators, data);
+        ICoordinate(coordinationStrategy).removeCoordinators(_coordinators, data);
     }
 
     function isContributor(address _contributor) external view override returns (bool) {
-        return ICoordinate(IStrategyRegistry(strategyRegistry).getStrategy(coordinationStrategyId).implementation)
-            .isContributor(_contributor);
+        return ICoordinate(coordinationStrategy).isContributor(_contributor);
     }
 
     function isCoordinator(address _coordinator) external view override returns (bool) {
-        return ICoordinate(IStrategyRegistry(strategyRegistry).getStrategy(coordinationStrategyId).implementation)
-            .isCoordinator(_coordinator);
+        return ICoordinate(coordinationStrategy).isCoordinator(_coordinator);
     }
 
     // Commit
 
     function commit(address user, address tokenAddress, uint256 tokenAmount) external payable override {
-        ICommit(IStrategyRegistry(strategyRegistry).getStrategy(commitmentStrategyId).implementation).commit(
-            user, tokenAddress, tokenAmount
-        );
+        ICommit(commitmentStrategy).commit(user, tokenAddress, tokenAmount);
     }
 
     function revoke(address user, address tokenAddress, uint256 tokenAmount) external payable override {
-        ICommit(IStrategyRegistry(strategyRegistry).getStrategy(commitmentStrategyId).implementation).revoke(
-            user, tokenAddress, tokenAmount
-        );
+        ICommit(commitmentStrategy).revoke(user, tokenAddress, tokenAmount);
     }
 
     // Fund
 
     function deposit(address user, address tokenAddress, uint256 tokenAmount) external payable override {
-        IFund(IStrategyRegistry(strategyRegistry).getStrategy(fundingStrategyId).implementation).deposit(
-            user, tokenAddress, tokenAmount
-        );
+        IFund(fundingStrategy).deposit(user, tokenAddress, tokenAmount);
     }
 
     function withdraw(address user, address tokenAddress, uint256 tokenAmount) external payable override {
-        IFund(IStrategyRegistry(strategyRegistry).getStrategy(fundingStrategyId).implementation).withdraw(
-            user, tokenAddress, tokenAmount
-        );
+        IFund(fundingStrategy).withdraw(user, tokenAddress, tokenAmount);
     }
 
     // Evaluate
 
     function submit(bytes memory evaluationData) external override {
-        IEvaluate(IStrategyRegistry(strategyRegistry).getStrategy(evaluationStrategyId).implementation).submit(
-            evaluationData
-        );
+        IEvaluate(evaluationStrategy).submit(evaluationData);
     }
 
     function updateEvaluationStatus(EvaluationStatus _status) external override {
-        IEvaluate(IStrategyRegistry(strategyRegistry).getStrategy(evaluationStrategyId).implementation)
-            .updateEvaluationStatus(_status);
+        IEvaluate(evaluationStrategy).updateEvaluationStatus(_status);
     }
 
     function getEvaluationStatus() external view override returns (EvaluationStatus) {
-        return IEvaluate(IStrategyRegistry(strategyRegistry).getStrategy(evaluationStrategyId).implementation)
-            .getEvaluationStatus();
+        return IEvaluate(evaluationStrategy).getEvaluationStatus();
     }
 
     // WERK
@@ -146,10 +110,10 @@ contract WERKImplementation is IWERK, OwnableUpgradeable {
     function getWerkInfo() external view returns (WerkInfo memory werk) {
         return WerkInfo({
             owner: owner(),
-            coordinationStrategyId: coordinationStrategyId,
-            commitmentStrategyId: commitmentStrategyId,
-            evaluationStrategyId: evaluationStrategyId,
-            fundingStrategyId: fundingStrategyId,
+            coordinationStrategy: coordinationStrategy,
+            commitmentStrategy: commitmentStrategy,
+            evaluationStrategy: evaluationStrategy,
+            fundingStrategy: fundingStrategy,
             status: status
         });
     }

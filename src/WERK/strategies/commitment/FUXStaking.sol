@@ -9,11 +9,10 @@ import { ERC1155HolderUpgradeable } from
 import { ERC165Checker } from "@openzeppelin/contracts/utils/introspection/ERC165Checker.sol";
 
 contract FUXStaking is ICommit, IFUXable, ERC1155HolderUpgradeable, OwnableUpgradeable {
-    address public immutable fuxContract;
+    address public constant FUX_CONTRACT = 0x2da5896b58DFde573d1D3a8FdB88Ca22b371c7e4;
 
     /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor(address _fux) {
-        fuxContract = _fux;
+    constructor() {
         _disableInitializers();
     }
 
@@ -25,29 +24,29 @@ contract FUXStaking is ICommit, IFUXable, ERC1155HolderUpgradeable, OwnableUpgra
     }
 
     function commit(address user, address tokenAddress, uint256 tokenAmount) external payable {
-        if (tokenAddress != fuxContract) {
+        if (tokenAddress != FUX_CONTRACT) {
             revert TokenNotAccepted();
         }
         giveFUX(user, address(this), tokenAmount);
     }
 
     function revoke(address user, address tokenAddress, uint256 tokenAmount) external payable {
-        if (tokenAddress != fuxContract) {
+        if (tokenAddress != FUX_CONTRACT) {
             revert TokenNotAccepted();
         }
         takeFUX(user, address(this), tokenAmount);
     }
 
     function giveFUX(address user, address workstream, uint256 fuxGiven) public override {
-        IFUXable(fuxContract).giveFUX(user, workstream, fuxGiven);
+        IFUXable(FUX_CONTRACT).giveFUX(user, workstream, fuxGiven);
 
-        emit UserCommitted(workstream, user, fuxContract, fuxGiven);
+        emit UserCommitted(workstream, user, FUX_CONTRACT, fuxGiven);
     }
 
     function takeFUX(address user, address workstream, uint256 fuxTaken) public override {
-        IFUXable(fuxContract).takeFUX(user, workstream, fuxTaken);
+        IFUXable(FUX_CONTRACT).takeFUX(user, workstream, fuxTaken);
 
-        emit UserWithdrawn(workstream, user, fuxContract, fuxTaken);
+        emit UserWithdrawn(workstream, user, FUX_CONTRACT, fuxTaken);
     }
 
     modifier isFuxable(address _contract) {

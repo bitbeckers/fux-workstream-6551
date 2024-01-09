@@ -13,22 +13,21 @@ contract StrategyRegistry is IStrategyRegistry, Ownable {
     function createStrategy(
         StrategyTypes strategyType,
         address implementation,
-        bool isActive,
-        bytes4 functionSelector
+        bool isActive
     )
         external
         onlyOwner
         returns (bytes32 strategyId)
     {
-        bytes32 salt = keccak256(abi.encodePacked(strategyType, implementation, functionSelector));
+        bytes32 salt = keccak256(abi.encodePacked(strategyType, implementation));
 
-        if (strategies[salt].functionSelector != bytes4(0)) {
+        if (strategies[salt].implementation != address(0)) {
             return salt;
         }
 
-        strategies[salt] = StrategyInfo(strategyType, implementation, isActive, functionSelector);
+        strategies[salt] = StrategyInfo(strategyType, salt, implementation, isActive);
 
-        emit StrategyCreated(strategyType, implementation, isActive);
+        emit StrategyCreated(strategyType, salt, implementation, isActive);
 
         return salt;
     }

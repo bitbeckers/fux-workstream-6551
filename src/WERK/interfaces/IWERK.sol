@@ -18,16 +18,17 @@ interface IWERK is ICoordinate, ICommit, IEvaluate, IFund {
 
     struct WerkInfo {
         address owner;
-        bytes32 coordinationStrategyId;
-        bytes32 commitmentStrategyId;
-        bytes32 evaluationStrategyId;
-        bytes32 fundingStrategyId;
+        address coordinationStrategy;
+        address commitmentStrategy;
+        address evaluationStrategy;
+        address fundingStrategy;
         WorkstreamStatus status;
     }
 
     event WorkstreamCreated(address owner, address instance, uint256 tokenId);
     event WorkstreamStatusUpdated(address operator, address user, WorkstreamStatus status);
 
+    error NotApprovedOrOwner();
     error WorkstreamNotActive();
     error UpdatingWorkstreamStatusFailed();
 

@@ -1,6 +1,4 @@
-@openzeppelin/contracts/proxy/ERC1967/ERC1967Upgrade=/lib/tokenbound/lib/openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Upgrade
 @openzeppelin/contracts/=node_modules/@openzeppelin/contracts/
 @openzeppelin/contracts-upgradeable/=node_modules/@openzeppelin/contracts-upgradeable/
 @prb/test/=node_modules/@prb/test/
 forge-std/=node_modules/forge-std/
-tokenbound/src/=lib/tokenbound/src/

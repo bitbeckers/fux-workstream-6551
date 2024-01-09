@@ -11,15 +11,15 @@ interface IStrategyRegistry {
 
     struct StrategyInfo {
         StrategyTypes strategyType;
+        bytes32 strategyId;
         address implementation;
         bool isActive;
-        bytes4 functionSelector;
     }
     /**
      * @dev The registry MUST emit the StrategyCreated event upon successful strategy creation.
      */
 
-    event StrategyCreated(StrategyTypes strategyType, address implementation, bool isActive);
+    event StrategyCreated(StrategyTypes strategyType, bytes32 strategyId, address implementation, bool isActive);
 
     event StrategyUpdated(bytes32 strategyId, bool isActive);
 
@@ -42,8 +42,7 @@ interface IStrategyRegistry {
     function createStrategy(
         StrategyTypes strategyType,
         address implementation,
-        bool isActive,
-        bytes4 functionSelector
+        bool isActive
     )
         external
         returns (bytes32 strategyId);

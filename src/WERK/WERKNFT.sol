@@ -11,9 +11,11 @@ import { IERC6551Registry } from "./interfaces/IERC6551Registry.sol";
 import { IWERK } from "./interfaces/IWERK.sol";
 import { IWERKFactory } from "./interfaces/IWERKFactory.sol";
 
-import { AccountProxy } from "tokenbound/src/AccountProxy.sol";
+interface IAccountProxy {
+    function initialize(address implementation) external;
+}
 
-contract WERK is ERC721, ERC721Enumerable, ERC721URIStorage, ERC721Pausable, Ownable, ERC721Burnable {
+contract WERKNFT is ERC721, ERC721Enumerable, ERC721URIStorage, ERC721Pausable, Ownable, ERC721Burnable {
     // https://docs.tokenbound.org/contracts/deployments
     address public constant ACCOUNT_REGISTRY = 0x000000006551c19487814612e58FE06813775758;
     address public constant ACCOUNT_PROXY = 0x55266d75D1a14E4572138116aF39863Ed6596E7F;
@@ -61,7 +63,7 @@ contract WERK is ERC721, ERC721Enumerable, ERC721URIStorage, ERC721Pausable, Own
             ACCOUNT_PROXY, bytes32(salt), block.chainid, address(this), tokenId
         );
 
-        AccountProxy(account).initialize(ACCOUNT_IMPLEMENTATION);
+        IAccountProxy(account).initialize(ACCOUNT_IMPLEMENTATION);
 
         // _initializationParams = abi.encode(
         // address _owner,
@@ -75,14 +77,16 @@ contract WERK is ERC721, ERC721Enumerable, ERC721URIStorage, ERC721Pausable, Own
 
         address werkInstance = IWERKFactory(werkFactory).createWerkInstance(initializationParameters);
 
-        _safeMint(account, tokenId);
+        _safeMint(msg.sender, tokenId);
         _setTokenURI(tokenId, uri);
 
-        emit WorkstreamCreated(account, werkInstance, tokenId);
+        emit IWERK.WorkstreamCreated(account, werkInstance, tokenId);
     }
 
     function updateWorkstreamMetadata(uint256 tokenId, string memory uri) public {
-        require(_isApprovedOrOwner(msg.sender, tokenId), "WERK: caller is not owner nor approved");
+        if (msg.sender != ownerOf(tokenId) || _isAuthorized(ownerOf(tokenId), msg.sender, tokenId)) {
+            revert ERC721InvalidOperator(msg.sender);
+        }
         _setTokenURI(tokenId, uri);
     }
 
