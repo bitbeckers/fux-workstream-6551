@@ -6,12 +6,12 @@ import { IEvaluate } from "../../interfaces/IEvaluate.sol";
 import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 contract SimplePeerEvaluation is IEvaluate, OwnableUpgradeable {
+    EvaluationStatus public evaluationStatus;
+    mapping(address user => bytes evaluationData) public evaluationData;
+
     error LengthMismatch();
     error NoSelfEvaluation();
     error InvalidTotals();
-
-    EvaluationStatus public evaluationStatus;
-    mapping(address user => bytes evaluationData) public evaluationData;
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {

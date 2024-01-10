@@ -8,8 +8,6 @@ interface ICoordinate {
     event CoordinatorsAdded(address[] coordinators, bytes data);
     event CoordinatorsRemoved(address[] coordinators, bytes data);
 
-    error NotAllowedOrApproved();
-
     function isContributor(address _contributor) external view returns (bool);
     function isCoordinator(address _coordinator) external view returns (bool);
 

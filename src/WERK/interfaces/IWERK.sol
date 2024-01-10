@@ -4,10 +4,11 @@ pragma solidity ^0.8.23;
 import { IStrategyRegistry } from "./IStrategyRegistry.sol";
 import { ICoordinate } from "./ICoordinate.sol";
 import { ICommit } from "./ICommit.sol";
+import { IDistribute } from "./IDistribute.sol";
 import { IEvaluate } from "./IEvaluate.sol";
 import { IFund } from "./IFund.sol";
 
-interface IWERK is ICoordinate, ICommit, IEvaluate, IFund {
+interface IWERK is ICoordinate, ICommit, IEvaluate, IDistribute, IFund {
     enum WorkstreamStatus {
         Pending,
         Active,
@@ -22,13 +23,13 @@ interface IWERK is ICoordinate, ICommit, IEvaluate, IFund {
         address commitmentStrategy;
         address evaluationStrategy;
         address fundingStrategy;
+        address payoutStrategy;
         WorkstreamStatus status;
     }
 
     event WorkstreamCreated(address owner, address instance, uint256 tokenId);
     event WorkstreamStatusUpdated(address operator, address user, WorkstreamStatus status);
 
-    error NotApprovedOrOwner();
     error WorkstreamNotActive();
     error UpdatingWorkstreamStatusFailed();
 

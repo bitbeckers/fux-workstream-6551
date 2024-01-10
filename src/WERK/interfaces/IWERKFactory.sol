@@ -4,14 +4,14 @@ pragma solidity 0.8.23;
 interface IWERKFactory {
     event WerkCreated(
         address indexed werk,
-        bytes initializer,
         address commitmentStrategy,
         address coordinationStrategy,
         address evaluationStrategy,
-        address fundingStrategy
+        address fundingStrategy,
+        address payoutStrategy
     );
-    event WerkImplementationUpdated(address indexed implementation);
 
+    event WerkImplementationUpdated(address indexed implementation);
     event StrategyRegistryUpdated(address indexed strategyRegistry);
 
     function setImplementation(address _werkImplementation) external;

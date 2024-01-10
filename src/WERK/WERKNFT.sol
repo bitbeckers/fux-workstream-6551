@@ -52,7 +52,8 @@ contract WERKNFT is ERC721, ERC721Enumerable, ERC721URIStorage, ERC721Pausable, 
         bytes32 coordinationStrategyId,
         bytes32 commitmentStrategyId,
         bytes32 evaluationStrategyId,
-        bytes32 fundingStrategyId
+        bytes32 fundingStrategyId,
+        bytes32 payoutStrategyId
     )
         public
         returns (address account, uint256 tokenId)
@@ -71,9 +72,11 @@ contract WERKNFT is ERC721, ERC721Enumerable, ERC721URIStorage, ERC721Pausable, 
         // bytes32 _commitmentStrategyId,
         // bytes32 _evaluationStrategyId,
         // bytes32 _fundingStrategyId,
+        // bytes32 _payoutStrategyId
         // )
-        bytes memory initializationParameters =
-            abi.encode(to, coordinationStrategyId, commitmentStrategyId, evaluationStrategyId, fundingStrategyId);
+        bytes memory initializationParameters = abi.encode(
+            to, coordinationStrategyId, commitmentStrategyId, evaluationStrategyId, fundingStrategyId, payoutStrategyId
+        );
 
         address werkInstance = IWERKFactory(werkFactory).createWerkInstance(initializationParameters);
 

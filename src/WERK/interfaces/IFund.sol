@@ -8,8 +8,6 @@ interface IFund {
 
     error DepositFailed();
     error WithdrawalFailed();
-    error UnsupportedToken();
-    error InsufficientFunds();
 
     function deposit(address user, address tokenAddress, uint256 tokenAmount) external payable;
 

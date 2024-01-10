@@ -7,8 +7,10 @@
     "url": "https://github.com/bitbeckers"
   },
   "dependencies": {
+    "@gnosis.pm/zodiac": "^3.5.2",
     "@openzeppelin/contracts": "^5.0.1",
-    "@openzeppelin/contracts-upgradeable": "^5.0.1"
+    "@openzeppelin/contracts-upgradeable": "^5.0.1",
+    "@safe-global/safe-contracts": "1.4.1-build.0"
   },
   "devDependencies": {
     "@prb/test": "^0.6.4",

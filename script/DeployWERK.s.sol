@@ -18,25 +18,33 @@ import { BaseScript } from "./Base.s.sol";
 /// @dev See the Solidity Scripting tutorial: https://book.getfoundry.sh/tutorials/solidity-scripting
 contract DeployWERK is BaseScript {
     function run() public broadcast {
-        bytes32 _salt = keccak256("v0.1");
+        bytes32 _salt = keccak256("v0.3");
 
-        address strategyRegistry = 0x77e247f195B8f6AC09a539a5C7BbA3d2F2Fb7A69;
-        bytes32 fuxStakingId = 0x0d09c51f0ac855a550097f2abe1c934de3df38af069520dda15896da57f6a020;
-        bytes32 allowListId = 0x9c0e67f07f162fb2133457cbca5e25019fbfb5cbfaf73be587a144142f3903cc;
-        bytes32 peerEvaluationId = 0x2ee31ef770153b087502dc18352b1ac2decbf47b92cc6dbdd4c3c20b4acff0bb;
-        bytes32 directDepositId = 0x4dbbc26cc497c0ec31a0629e36db0c955c7c956cc206114c2f09f02dbb9846ca;
+        address strategyRegistry = 0x241dDad60f6dEde983f67c496FfAdD9a1cBf3f2f;
+        bytes32 fuxStakingId = 0x664b14947c4acefa12daff80395d2208043e7b616975fc8f20d23a0204cc2b25;
+        bytes32 allowListId = 0x7e0bb5d32b56c645d0ec518278dbdd455ba9cb0aef4b5f5e1b948c3c8cc8bdf6;
+        bytes32 peerEvaluationId = 0x90b92fef49f68b1f2508955e08ad8fcb052175afa2289b5883fc6660ce83c4f7;
+        bytes32 directDepositId = 0x554cdef72cf81a028dcca12b19667df6bee27e545aa7effb7639a14449b6652a;
+        bytes32 simpleDistributionId = 0x28c0b3171d84a169a6516177f2a53929989d6278df8aacb2ad15c5ed6defa847;
 
         // WERK implementation
         WERKImplementation werkImplementation = new WERKImplementation{ salt: _salt }();
 
         // WERK factory
-        WERKFactory werkFactory = new WERKFactory{ salt: _salt }(broadcaster);
-        werkFactory.setImplementation(address(werkImplementation));
-        werkFactory.setStrategyRegistry(strategyRegistry);
+        WERKFactory werkFactory =
+            new WERKFactory{ salt: _salt }(broadcaster, address(werkImplementation), strategyRegistry);
 
         // WERK NFT
         WERKNFT werkNFT = new WERKNFT{ salt: _salt }(broadcaster, address(werkFactory));
 
-        werkNFT.mintWorkstream(broadcaster, "FIRST MINT", fuxStakingId, allowListId, peerEvaluationId, directDepositId);
+        werkNFT.mintWorkstream(
+            broadcaster,
+            "FIRST MINT",
+            fuxStakingId,
+            allowListId,
+            peerEvaluationId,
+            directDepositId,
+            simpleDistributionId
+        );
     }
 }

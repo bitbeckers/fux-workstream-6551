@@ -15,17 +15,18 @@ A Foundry-based template for developing Solidity smart contracts, with sensible 
 
 ### Sepolia
 
-| Contract Name         | Address                                                                                                                       |
-| --------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| FUX                   | [0x2da5896b58DFde573d1D3a8FdB88Ca22b371c7e4](https://sepolia.etherscan.io/address/0x2da5896b58DFde573d1D3a8FdB88Ca22b371c7e4) |
-| StrategyRegistry      | [0x77e247f195B8f6AC09a539a5C7BbA3d2F2Fb7A69](https://sepolia.etherscan.io/address/0x77e247f195B8f6AC09a539a5C7BbA3d2F2Fb7A69) |
-| WERKImplementation    | [0x6930E6BBD816aAEf658780D4f36036B79517b389](https://sepolia.etherscan.io/address/0x6930E6BBD816aAEf658780D4f36036B79517b389) |
-| WERKFactory           | [0x43686d0D6EB15c876705309dC4607bF2FB3505C7](https://sepolia.etherscan.io/address/0x43686d0D6EB15c876705309dC4607bF2FB3505C7) |
-| WERKNFT               | [0x5D95eE47D4e6f11F9aB1093A6B5490682259c65D](https://sepolia.etherscan.io/address/0x5D95eE47D4e6f11F9aB1093A6B5490682259c65D) |
-| FUXStaking            | [0x40697C1Cd1A9D1388168e6fd93F3e59B025BdB44](https://sepolia.etherscan.io/address/0x40697C1Cd1A9D1388168e6fd93F3e59B025BdB44) |
-| AllowListCoordination | [0xAA8651F596d5C43A6181C04D21F982a80f4C7937](https://sepolia.etherscan.io/address/0xAA8651F596d5C43A6181C04D21F982a80f4C7937) |
-| SimplePeerEvaluation  | [0xc3728aeB5a64E6457F74EF5bDE15f212bdc7685a](https://sepolia.etherscan.io/address/0xc3728aeB5a64E6457F74EF5bDE15f212bdc7685a) |
-| DirectDeposit         | [0x200465d19DbA364E5622C4E9E661614Ce28f10F1](https://sepolia.etherscan.io/address/0x200465d19DbA364E5622C4E9E661614Ce28f10F1) |
+| Contract Name         | Address                                                                                                                        |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| FUX                   | [0x2da5896b58DFde573d1D3a8FdB88Ca22b371c7e4](https://sepolia.etherscan.io/address/0x2da5896b58DFde573d1D3a8FdB88Ca22b371c7e4)  |
+| StrategyRegistry      | [0x241dDad60f6dEde983f67c496FfAdD9a1cBf3f2f](https://sepolia.etherscan.io/address/0x241dDad60f6dEde983f67c496FfAdD9a1cBf3f2f)  |
+| WERKImplementation    | [0x977Eac5f08E96fEc68fe3E26c3417e23C112A97d](https://sepolia.etherscan.io/address/0x977Eac5f08E96fEc68fe3E26c3417e23C112A97d)  |
+| WERKFactory           | [0x62D24bDB91741b5869E6a3d1069954B3A3C0F9e8](https://sepolia.etherscan.io/address/0x62D24bDB91741b5869E6a3d1069954B3A3C0F9e8)  |
+| WERKNFT               | [0x2775aE70fcCD70145F3C13947513609d3fEB60fa](https://sepolia.etherscan.io/address/0x2775aE70fcCD70145F3C13947513609d3fEB60fa)  |
+| FUXStaking            | [0x62743Ee44a6e68aE01101425C5Ff64a35bC6d621](https://sepolia.etherscan.io/address/0x62743Ee44a6e68aE01101425C5Ff64a35bC6d621)  |
+| AllowListCoordination | [0x5374778bb9C3Baa3EB3Ea80abC58ea981A355960](https://sepolia.etherscan.io/address/0x5374778bb9C3Baa3EB3Ea80abC58ea981A355960)  |
+| SimplePeerEvaluation  | [0x84c759e92e1029910e1b4b8A5e1806A71Aaa4a4d](https://sepolia.etherscan.io/address/0x84c759e92e1029910e1b4b8A5e1806A71Aaa4a4d)  |
+| DirectDeposit         | [0xC1f4ED5A6A22D426F00eEAFF558E4C175cF7C86C](https://sepolia.etherscan.io/address/0xC1f4ED5A6A22D426F00eEAFF558E4C175cF7C86C)  |
+| SimpleDistribution    | [0xd14D46428FbCeA887dFBD5ABEd261cf9b0Bd47f4.](https://sepolia.etherscan.io/address/0xd14D46428FbCeA887dFBD5ABEd261cf9b0Bd47f4) |
 
 ## What's Inside
 

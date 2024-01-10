@@ -6,7 +6,8 @@ interface IStrategyRegistry {
         Coordinate,
         Commit,
         Fund,
-        Evaluate
+        Evaluate,
+        Payout
     }
 
     struct StrategyInfo {

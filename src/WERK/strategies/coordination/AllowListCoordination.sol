@@ -5,6 +5,8 @@ import { ICoordinate } from "../../interfaces/ICoordinate.sol";
 
 import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
+import { NotApprovedOrOwner } from "../../libraries/Errors.sol";
+
 contract AllowListCoordination is ICoordinate, OwnableUpgradeable {
     mapping(address user => bool isCoordinator) public coordinators;
     mapping(address user => bool isContributor) public contributors;
@@ -21,28 +23,56 @@ contract AllowListCoordination is ICoordinate, OwnableUpgradeable {
         __Ownable_init(_workstreamAccount);
     }
 
-    function addContributors(address[] memory _contributors, bytes memory data) external override onlyCoordinator {
+    function addContributors(
+        address[] memory _contributors,
+        bytes memory data
+    )
+        external
+        override
+        onlyCoordinatorOrOwner
+    {
         for (uint256 i = 0; i < _contributors.length; i++) {
             contributors[_contributors[i]] = true;
         }
         emit ContributorsAdded(_contributors, data);
     }
 
-    function removeContributors(address[] memory _contributors, bytes memory data) external override onlyCoordinator {
+    function removeContributors(
+        address[] memory _contributors,
+        bytes memory data
+    )
+        external
+        override
+        onlyCoordinatorOrOwner
+    {
         for (uint256 i = 0; i < _contributors.length; i++) {
             contributors[_contributors[i]] = false;
         }
         emit ContributorsRemoved(_contributors, data);
     }
 
-    function addCoordinators(address[] memory _coordinators, bytes memory data) external override onlyCoordinator {
+    function addCoordinators(
+        address[] memory _coordinators,
+        bytes memory data
+    )
+        external
+        override
+        onlyCoordinatorOrOwner
+    {
         for (uint256 i = 0; i < _coordinators.length; i++) {
             coordinators[_coordinators[i]] = true;
         }
         emit CoordinatorsAdded(_coordinators, data);
     }
 
-    function removeCoordinators(address[] memory _coordinators, bytes memory data) external override onlyCoordinator {
+    function removeCoordinators(
+        address[] memory _coordinators,
+        bytes memory data
+    )
+        external
+        override
+        onlyCoordinatorOrOwner
+    {
         for (uint256 i = 0; i < _coordinators.length; i++) {
             coordinators[_coordinators[i]] = false;
         }
@@ -57,8 +87,8 @@ contract AllowListCoordination is ICoordinate, OwnableUpgradeable {
         return coordinators[_coordinator];
     }
 
-    modifier onlyCoordinator() {
-        if (!coordinators[msg.sender]) revert NotAllowedOrApproved();
+    modifier onlyCoordinatorOrOwner() {
+        if (!coordinators[msg.sender] && owner() != msg.sender) revert NotApprovedOrOwner();
         _;
     }
 }

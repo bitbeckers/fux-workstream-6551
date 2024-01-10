@@ -3,6 +3,7 @@ pragma solidity ^0.8.23;
 
 import { IWERK } from "./interfaces/IWERK.sol";
 import { ICommit } from "./interfaces/ICommit.sol";
+import { IDistribute } from "./interfaces/IDistribute.sol";
 import { IEvaluate } from "./interfaces/IEvaluate.sol";
 import { IFund } from "./interfaces/IFund.sol";
 import { ICoordinate } from "./interfaces/ICoordinate.sol";
@@ -14,6 +15,7 @@ contract WERKImplementation is IWERK, OwnableUpgradeable {
     address internal coordinationStrategy;
     address internal evaluationStrategy;
     address internal fundingStrategy;
+    address internal payoutStrategy;
     WorkstreamStatus internal status;
 
     /// @custom:oz-upgrades-unsafe-allow constructor
@@ -27,6 +29,7 @@ contract WERKImplementation is IWERK, OwnableUpgradeable {
     // address _coordinationStrategy,
     // address _evaluationStrategy,
     // address _fundingStrategy,
+    // address _payoutStrategy
     // )
     function setUp(bytes memory _initializationParams) public virtual initializer {
         (
@@ -34,13 +37,15 @@ contract WERKImplementation is IWERK, OwnableUpgradeable {
             address _commitmentStrategy,
             address _coordinationStrategy,
             address _evaluationStrategy,
-            address _fundingStrategy
-        ) = abi.decode(_initializationParams, (address, address, address, address, address));
+            address _fundingStrategy,
+            address _payoutStrategy
+        ) = abi.decode(_initializationParams, (address, address, address, address, address, address));
 
         commitmentStrategy = _commitmentStrategy;
         coordinationStrategy = _coordinationStrategy;
         evaluationStrategy = _evaluationStrategy;
         fundingStrategy = _fundingStrategy;
+        payoutStrategy = _payoutStrategy;
 
         __Ownable_init(_owner);
     }
@@ -87,7 +92,7 @@ contract WERKImplementation is IWERK, OwnableUpgradeable {
         IFund(fundingStrategy).deposit(user, tokenAddress, tokenAmount);
     }
 
-    function withdraw(address user, address tokenAddress, uint256 tokenAmount) external payable override {
+    function withdraw(address user, address tokenAddress, uint256 tokenAmount) external payable override onlyOwner {
         IFund(fundingStrategy).withdraw(user, tokenAddress, tokenAmount);
     }
 
@@ -105,6 +110,12 @@ contract WERKImplementation is IWERK, OwnableUpgradeable {
         return IEvaluate(evaluationStrategy).getEvaluationStatus();
     }
 
+    // Distribute
+
+    function distribute(bytes memory payoutData) external payable override onlyOwner {
+        IDistribute(evaluationStrategy).distribute(payoutData);
+    }
+
     // WERK
 
     function getWerkInfo() external view returns (WerkInfo memory werk) {
@@ -114,6 +125,7 @@ contract WERKImplementation is IWERK, OwnableUpgradeable {
             commitmentStrategy: commitmentStrategy,
             evaluationStrategy: evaluationStrategy,
             fundingStrategy: fundingStrategy,
+            payoutStrategy: payoutStrategy,
             status: status
         });
     }
