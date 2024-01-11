@@ -19,7 +19,7 @@ import { BaseScript } from "./Base.s.sol";
 /// @dev See the Solidity Scripting tutorial: https://book.getfoundry.sh/tutorials/solidity-scripting
 contract DeployStrategyRegistry is BaseScript {
     function run() public broadcast {
-        bytes32 _salt = keccak256("v0.5");
+        bytes32 _salt = keccak256("v0.6");
 
         // Strategies
         FUXStaking fuxStaking = new FUXStaking{ salt: _salt }();

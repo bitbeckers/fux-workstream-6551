@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.23;
 
-import { ERC1155 } from "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
+import { ERC1155 } from "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import { ERC1155Pausable } from "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Pausable.sol";
 import { Base64 } from "@openzeppelin/contracts/utils/Base64.sol";
 import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
@@ -21,15 +21,16 @@ contract FUX is IFUX, ERC1155, Ownable, ERC1155Pausable {
     uint256 public constant FUX_TOKEN_ID = 1;
     uint256 internal sbtTokenCounter = 2;
 
-    mapping(uint256 id => address user) public sbtIds;
+    mapping(uint256 id => address user) public sbtUserAddress;
+    mapping(address user => uint256 sbtId) public userSbtId;
 
     /**
      * @dev This mapping keeps track of whether an address is a FUXer
      */
-    mapping(address user => bool isFuxer) internal isFuxer;
+    mapping(address user => bool isFuxer) internal _isFuxer;
 
     // solhint-disable-next-line no-empty-blocks
-    constructor(address initialOwner) ERC1155("") Ownable(initialOwner) { }
+    constructor(address initialOwner) ERC1155("FUX") Ownable(initialOwner) { }
 
     function setURI(string memory newuri) public onlyOwner {
         _setURI(newuri);
@@ -44,8 +45,8 @@ contract FUX is IFUX, ERC1155, Ownable, ERC1155Pausable {
     }
 
     function mint(address operator, address fuxUser) public {
-        if (isFuxer[fuxUser]) revert UserAlreadyCreated();
-        isFuxer[fuxUser] = true;
+        if (_isFuxer[fuxUser]) revert UserAlreadyCreated();
+        _isFuxer[fuxUser] = true;
         uint256 sbtId = sbtTokenCounter;
 
         _mint(fuxUser, FUX_TOKEN_ID, 100, "");
@@ -67,17 +68,34 @@ contract FUX is IFUX, ERC1155, Ownable, ERC1155Pausable {
         emit FUXTaken(user, workstream, amount);
     }
 
+    function isFuxer(address user) public view returns (bool) {
+        return _isFuxer[user];
+    }
+
+    /**
+     * @dev Returns the URI for a given token ID
+     * @param tokenId The ID of the token
+     * @return The URI for the given token ID
+     */
+    function uri(uint256 tokenId) public view override returns (string memory) {
+        if (tokenId > 1) {
+            return _constructTokenURI(tokenId);
+        }
+        return ERC1155.uri(tokenId);
+    }
+
     /**
      * @dev Mints FuxSBT to the caller
      * @notice This function can only be called once per address
      * @dev Emits a Fux
      */
     function _mintSBT() internal {
-        if (sbtIds[sbtTokenCounter] != address(0)) revert UserAlreadyCreated();
+        if (userSbtId[msg.sender] != 0) revert UserAlreadyCreated();
 
         _mint(msg.sender, sbtTokenCounter, 1, "");
 
-        sbtIds[sbtTokenCounter] = msg.sender;
+        sbtUserAddress[sbtTokenCounter] = msg.sender;
+        userSbtId[msg.sender] = sbtTokenCounter;
 
         sbtTokenCounter += 1;
     }
@@ -88,13 +106,14 @@ contract FUX is IFUX, ERC1155, Ownable, ERC1155Pausable {
      */
     function _constructTokenURI(uint256 _tokenId) internal view returns (string memory) {
         string memory _nftName = string(abi.encodePacked("FuxSBT"));
-        address _owner = sbtIds[_tokenId];
+        address _owner = sbtUserAddress[_tokenId];
         string memory _image = string(
             abi.encodePacked(
-                "ipfs://QmNXwWzzZGvS3sp9JChSArdrZ7p8eo7QjBiW499yBBXRD3?vfux=",
-                Strings.toString(ERC1155(address(this)).balanceOf(_owner, 0)),
+                uri(2),
+                "?vfux=",
+                Strings.toString(ERC1155Pausable(address(this)).balanceOf(_owner, 0)),
                 "&percentage=",
-                Strings.toString(100 - ERC1155(address(this)).balanceOf(_owner, 1)),
+                Strings.toString(100 - ERC1155Pausable(address(this)).balanceOf(_owner, 1)),
                 "&address=",
                 Strings.toHexString(_owner)
             )

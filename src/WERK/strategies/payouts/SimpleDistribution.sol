@@ -38,5 +38,7 @@ contract SimpleDistribution is IDistribute, OwnableUpgradeable {
                 )
             );
         }
+
+        emit Distributed(msg.sender, payoutData);
     }
 }

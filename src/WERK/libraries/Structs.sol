@@ -1,8 +1,15 @@
+// SPDX-License-Identifier: MIT
+
 pragma solidity ^0.8.23;
 
-library Structs {
-    struct AcceptedToken {
-        address tokenAddress;
-        uint256 tokenAmount;
-    }
+struct AcceptedToken {
+    address tokenAddress;
+    uint256 tokenId;
+}
+
+struct Commitment {
+    address user;
+    address tokenAddress;
+    uint256 tokenId;
+    uint256 tokenAmount;
 }

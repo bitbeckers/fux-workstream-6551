@@ -9,6 +9,6 @@ import { BaseScript } from "./Base.s.sol";
 contract DeployFUX is BaseScript {
     function run() public broadcast {
         bytes32 _salt = keccak256("v0.2");
-        FUX fux = new FUX{ salt: _salt }(broadcaster);
+        new FUX{ salt: _salt }(broadcaster);
     }
 }

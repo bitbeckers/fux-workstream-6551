@@ -10,6 +10,9 @@ import { ICoordinate } from "./interfaces/ICoordinate.sol";
 import { IStrategyRegistry } from "./interfaces/IStrategyRegistry.sol";
 import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
+import { AcceptedToken, Commitment } from "./libraries/Structs.sol";
+import { DelegateCallFailed } from "./libraries/Errors.sol";
+
 contract WERKImplementation is IWERK, OwnableUpgradeable {
     address internal commitmentStrategy;
     address internal coordinationStrategy;
@@ -53,19 +56,35 @@ contract WERKImplementation is IWERK, OwnableUpgradeable {
     // Coordinate
 
     function addContributors(address[] memory _contributors, bytes memory data) external override {
-        ICoordinate(coordinationStrategy).addContributors(_contributors, data);
+        (bool success,) = coordinationStrategy.delegatecall(
+            abi.encodeWithSignature("addContributors(address[],bytes)", _contributors, data)
+        );
+
+        if (!success) revert DelegateCallFailed();
     }
 
     function removeContributors(address[] memory _contributors, bytes memory data) external override {
-        ICoordinate(coordinationStrategy).removeContributors(_contributors, data);
+        (bool success,) = coordinationStrategy.delegatecall(
+            abi.encodeWithSignature("removeContributors(address[],bytes)", _contributors, data)
+        );
+
+        if (!success) revert DelegateCallFailed();
     }
 
     function addCoordinators(address[] memory _coordinators, bytes memory data) external override {
-        ICoordinate(coordinationStrategy).addCoordinators(_coordinators, data);
+        (bool success,) = coordinationStrategy.delegatecall(
+            abi.encodeWithSignature("addCoordinators(address[],bytes)", _coordinators, data)
+        );
+
+        if (!success) revert DelegateCallFailed();
     }
 
     function removeCoordinators(address[] memory _coordinators, bytes memory data) external override {
-        ICoordinate(coordinationStrategy).removeCoordinators(_coordinators, data);
+        (bool success,) = coordinationStrategy.delegatecall(
+            abi.encodeWithSignature("removeCoordinators(address[],bytes)", _coordinators, data)
+        );
+
+        if (!success) revert DelegateCallFailed();
     }
 
     function isContributor(address _contributor) external view override returns (bool) {
@@ -78,32 +97,82 @@ contract WERKImplementation is IWERK, OwnableUpgradeable {
 
     // Commit
 
-    function commit(address user, address tokenAddress, uint256 tokenAmount) external payable override {
-        ICommit(commitmentStrategy).commit(user, tokenAddress, tokenAmount);
+    function commit(address user, address tokenAddress, uint256 tokenId, uint256 tokenAmount) external payable {
+        (bool success,) = commitmentStrategy.delegatecall(
+            abi.encodeWithSignature("commit(address,address,uint256,uint256)", user, tokenAddress, tokenId, tokenAmount)
+        );
+
+        if (!success) revert DelegateCallFailed();
     }
 
-    function revoke(address user, address tokenAddress, uint256 tokenAmount) external payable override {
-        ICommit(commitmentStrategy).revoke(user, tokenAddress, tokenAmount);
+    function revoke(address user, address tokenAddress, uint256 tokenId, uint256 tokenAmount) external payable {
+        (bool success,) = commitmentStrategy.delegatecall(
+            abi.encodeWithSignature("revoke(address,address,uint256,uint256)", user, tokenAddress, tokenId, tokenAmount)
+        );
+
+        if (!success) revert DelegateCallFailed();
+    }
+
+    function getCommitments(address user) external view override returns (Commitment[] memory) {
+        return ICommit(commitmentStrategy).getCommitments(user);
     }
 
     // Fund
 
-    function deposit(address user, address tokenAddress, uint256 tokenAmount) external payable override {
-        IFund(fundingStrategy).deposit(user, tokenAddress, tokenAmount);
+    function deposit(address user, address tokenAddress, uint256 tokenId, uint256 tokenAmount) external payable {
+        (bool success,) = fundingStrategy.delegatecall(
+            abi.encodeWithSignature(
+                "deposit(address,address,uint256,uint256)", user, tokenAddress, tokenId, tokenAmount
+            )
+        );
+
+        if (!success) revert DelegateCallFailed();
     }
 
-    function withdraw(address user, address tokenAddress, uint256 tokenAmount) external payable override onlyOwner {
-        IFund(fundingStrategy).withdraw(user, tokenAddress, tokenAmount);
+    function withdraw(
+        address user,
+        address tokenAddress,
+        uint256 tokenId,
+        uint256 tokenAmount
+    )
+        external
+        payable
+        onlyOwner
+    {
+        (bool success,) = fundingStrategy.delegatecall(
+            abi.encodeWithSignature(
+                "withdraw(address,address,uint256,uint256)", user, tokenAddress, tokenId, tokenAmount
+            )
+        );
+
+        if (!success) revert DelegateCallFailed();
+    }
+
+    function isAcceptedToken(address tokenAddress, uint256 tokenId) external view override returns (bool isAccepted) {
+        return IFund(fundingStrategy).isAcceptedToken(tokenAddress, tokenId);
+    }
+
+    function setAcceptedTokens(AcceptedToken[] memory _acceptedTokens, bool accepted) external override onlyOwner {
+        (bool success,) = fundingStrategy.delegatecall(
+            abi.encodeWithSignature("setAcceptedTokens((address,uint256)[],bool)", _acceptedTokens, accepted)
+        );
+
+        if (!success) revert DelegateCallFailed();
     }
 
     // Evaluate
 
     function submit(bytes memory evaluationData) external override {
-        IEvaluate(evaluationStrategy).submit(evaluationData);
+        (bool success,) = evaluationStrategy.delegatecall(abi.encodeWithSignature("submit(bytes)", evaluationData));
+
+        if (!success) revert DelegateCallFailed();
     }
 
     function updateEvaluationStatus(EvaluationStatus _status) external override {
-        IEvaluate(evaluationStrategy).updateEvaluationStatus(_status);
+        (bool success,) =
+            evaluationStrategy.delegatecall(abi.encodeWithSignature("updateEvaluationStatus(uint8)", _status));
+
+        if (!success) revert DelegateCallFailed();
     }
 
     function getEvaluationStatus() external view override returns (EvaluationStatus) {
@@ -113,7 +182,9 @@ contract WERKImplementation is IWERK, OwnableUpgradeable {
     // Distribute
 
     function distribute(bytes memory payoutData) external payable override onlyOwner {
-        IDistribute(evaluationStrategy).distribute(payoutData);
+        (bool success,) = payoutStrategy.delegatecall(abi.encodeWithSignature("distribute(bytes)", payoutData));
+
+        if (!success) revert DelegateCallFailed();
     }
 
     // WERK

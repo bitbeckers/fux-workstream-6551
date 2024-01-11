@@ -2,6 +2,7 @@
 pragma solidity ^0.8.23;
 
 import { IFUXable } from "./IFUXable.sol";
+import "@openzeppelin/contracts/token/ERC1155/extensions/IERC1155MetadataURI.sol";
 
 interface IFUX is IFUXable {
     error NotAllowed();

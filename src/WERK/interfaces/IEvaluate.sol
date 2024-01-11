@@ -3,8 +3,9 @@ pragma solidity ^0.8.23;
 
 interface IEvaluate {
     enum EvaluationStatus {
+        CLOSED,
         OPEN,
-        CLOSED
+        COMPLETED
     }
 
     event EvaluationSubmitted(address user, bytes evaluationData);

@@ -48,7 +48,7 @@ contract SimplePeerEvaluation is IEvaluate, OwnableUpgradeable {
         emit EvaluationSubmitted(msg.sender, _evaluationData);
     }
 
-    function updateEvaluationStatus(EvaluationStatus _status) external {
+    function updateEvaluationStatus(EvaluationStatus _status) external onlyOwner() {
         evaluationStatus = _status;
         emit EvaluationStatusUpdated(_status);
     }

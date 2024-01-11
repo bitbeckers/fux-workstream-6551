@@ -15,18 +15,26 @@ A Foundry-based template for developing Solidity smart contracts, with sensible 
 
 ### Sepolia
 
-| Contract Name         | Address                                                                                                                        |
-| --------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| FUX                   | [0x2da5896b58DFde573d1D3a8FdB88Ca22b371c7e4](https://sepolia.etherscan.io/address/0x2da5896b58DFde573d1D3a8FdB88Ca22b371c7e4)  |
-| StrategyRegistry      | [0x241dDad60f6dEde983f67c496FfAdD9a1cBf3f2f](https://sepolia.etherscan.io/address/0x241dDad60f6dEde983f67c496FfAdD9a1cBf3f2f)  |
-| WERKImplementation    | [0x977Eac5f08E96fEc68fe3E26c3417e23C112A97d](https://sepolia.etherscan.io/address/0x977Eac5f08E96fEc68fe3E26c3417e23C112A97d)  |
-| WERKFactory           | [0x62D24bDB91741b5869E6a3d1069954B3A3C0F9e8](https://sepolia.etherscan.io/address/0x62D24bDB91741b5869E6a3d1069954B3A3C0F9e8)  |
-| WERKNFT               | [0x2775aE70fcCD70145F3C13947513609d3fEB60fa](https://sepolia.etherscan.io/address/0x2775aE70fcCD70145F3C13947513609d3fEB60fa)  |
-| FUXStaking            | [0x62743Ee44a6e68aE01101425C5Ff64a35bC6d621](https://sepolia.etherscan.io/address/0x62743Ee44a6e68aE01101425C5Ff64a35bC6d621)  |
-| AllowListCoordination | [0x5374778bb9C3Baa3EB3Ea80abC58ea981A355960](https://sepolia.etherscan.io/address/0x5374778bb9C3Baa3EB3Ea80abC58ea981A355960)  |
-| SimplePeerEvaluation  | [0x84c759e92e1029910e1b4b8A5e1806A71Aaa4a4d](https://sepolia.etherscan.io/address/0x84c759e92e1029910e1b4b8A5e1806A71Aaa4a4d)  |
-| DirectDeposit         | [0xC1f4ED5A6A22D426F00eEAFF558E4C175cF7C86C](https://sepolia.etherscan.io/address/0xC1f4ED5A6A22D426F00eEAFF558E4C175cF7C86C)  |
-| SimpleDistribution    | [0xd14D46428FbCeA887dFBD5ABEd261cf9b0Bd47f4.](https://sepolia.etherscan.io/address/0xd14D46428FbCeA887dFBD5ABEd261cf9b0Bd47f4) |
+| Contract Name         | Address                                                                                                                       |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| FUX                   | [0xDBB776B586C2254f5228dfa368F9adc8D4Dcd8f1](https://sepolia.etherscan.io/address/0xDBB776B586C2254f5228dfa368F9adc8D4Dcd8f1) |
+| StrategyRegistry      | [0x99591f8DC4a0ec3956689545b39CC0521F2f9960](https://sepolia.etherscan.io/address/0x99591f8DC4a0ec3956689545b39CC0521F2f9960) |
+| WERKImplementation    | [0x15734d0EFD8E4a99c036009A0a03e195a092dC51](https://sepolia.etherscan.io/address/0x15734d0EFD8E4a99c036009A0a03e195a092dC51) |
+| WERKFactory           | [0x19B7b76C8b7ec464b4Ff1D6DAac6e731C067073D](https://sepolia.etherscan.io/address/0x19B7b76C8b7ec464b4Ff1D6DAac6e731C067073D) |
+| WERKNFT               | [0x4a08Ca3850C18868ab586fc3D9712Fac621593B3](https://sepolia.etherscan.io/address/0x4a08Ca3850C18868ab586fc3D9712Fac621593B3) |
+| FUXStaking            | [0x9a50882F2Ceff6070638c0B6BBA7819AA3d5783a](https://sepolia.etherscan.io/address/0x9a50882F2Ceff6070638c0B6BBA7819AA3d5783a) |
+| AllowListCoordination | [0x92285ac6f06e208D86E06D515F1686f188865518](https://sepolia.etherscan.io/address/0x92285ac6f06e208D86E06D515F1686f188865518) |
+| SimplePeerEvaluation  | [0x06342A17A45F5A8C33ae5D6937612d350Ad19B39](https://sepolia.etherscan.io/address/0x06342A17A45F5A8C33ae5D6937612d350Ad19B39) |
+| DirectDeposit         | [0xDc989980807f59155de9d6776025228856742E23](https://sepolia.etherscan.io/address/0xDc989980807f59155de9d6776025228856742E23) |
+| SimpleDistribution    | [0x9D1501F75f733D4763ce2886Dbc96883F4EB867e](https://sepolia.etherscan.io/address/0x9D1501F75f733D4763ce2886Dbc96883F4EB867e) |
+
+IDs in registry:
+
+bytes32 fuxStakingId = 0x6b8751b8367be0bc1384cce56ff51454f781964e1c715825901b363d506b3bcd; bytes32 allowListId =
+0xe6bd3e801e71e9e619dfe1e2e91c4d171fc8a6eaa81555c12619e8683b0d33b1; bytes32 peerEvaluationId =
+0xf78fdd634cce0d68228ce09dc7681e20a9d39df11b51c5265fca401ed315c83c; bytes32 directDepositId =
+0x7b26ece6b81f2b8ab0f5b0f95284bbfe16c9d28709264d97553d58c85cf32a30; bytes32 simpleDistributionId =
+0xd8afd210eaa5981adc1e9a7771be634fa551d224849313cc5572351b1a273069;
 
 ## What's Inside
 
