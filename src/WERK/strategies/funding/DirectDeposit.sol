@@ -6,7 +6,7 @@ import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
-import { InsufficientFunds, UnsupportedToken } from "../../libraries/Errors.sol";
+import { InsufficientFunds, UnsupportedToken, CallFailed } from "../../libraries/Errors.sol";
 import { AcceptedToken } from "../../libraries/Structs.sol";
 
 contract DirectDeposit is IFund, OwnableUpgradeable {
@@ -46,12 +46,15 @@ contract DirectDeposit is IFund, OwnableUpgradeable {
         if (tokenAddress == address(0)) {
             if (msg.value > 0) {
                 if (msg.value != tokenAmount) revert InsufficientFunds();
+                (bool success,) = owner().call{ value: msg.value }("");
+
+                if (!success) revert CallFailed();
             } else {
                 revert InsufficientFunds();
             }
         } else {
             // Handle ERC20 token
-            IERC20(tokenAddress).transferFrom(user, address(this), tokenAmount);
+            IERC20(tokenAddress).transferFrom(user, owner(), tokenAmount);
         }
 
         emit FundsDeposited(user, tokenAddress, tokenId, tokenAmount);
@@ -70,9 +73,7 @@ contract DirectDeposit is IFund, OwnableUpgradeable {
     {
         // TODO improve handling so it supports both native, ERC20 and ERC1155
         if (tokenAddress == address(0)) {
-            if (address(this).balance < tokenAmount) revert InsufficientFunds();
-            (bool success,) = user.call{ value: tokenAmount }("");
-            if (!success) revert WithdrawalFailed();
+            payable(user).transfer(tokenAmount);
         } else {
             // Handle ERC20 token
             IERC20(tokenAddress).transferFrom(address(this), user, tokenAmount);

@@ -9,15 +9,17 @@ import { ERC1155HolderUpgradeable } from
     "@openzeppelin/contracts-upgradeable/token/ERC1155/utils/ERC1155HolderUpgradeable.sol";
 import { ERC165Checker } from "@openzeppelin/contracts/utils/introspection/ERC165Checker.sol";
 
-import { UnsupportedToken, UnsupportedWorkstream } from "../../libraries/Errors.sol";
+import { CallFailed, UnsupportedToken, UnsupportedWorkstream } from "../../libraries/Errors.sol";
 import { Commitment } from "../../libraries/Structs.sol";
 
 contract FUXStaking is ICommit, IFUXable, ERC1155HolderUpgradeable, OwnableUpgradeable {
-    address public constant FUX_CONTRACT = 0xDBB776B586C2254f5228dfa368F9adc8D4Dcd8f1;
+    address public immutable FUX_CONTRACT;
     mapping(address user => uint256 fuxStaked) public fuxStaked;
 
     /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor() {
+    constructor(address _fuxContract) {
+        FUX_CONTRACT = _fuxContract;
+
         _disableInitializers();
     }
 
@@ -37,7 +39,7 @@ contract FUXStaking is ICommit, IFUXable, ERC1155HolderUpgradeable, OwnableUpgra
         external
         payable
     {
-        giveFUX(user, address(this), tokenAmount);
+        FUXStaking.giveFUX(user, address(this), tokenAmount);
     }
 
     function revoke(
@@ -49,12 +51,14 @@ contract FUXStaking is ICommit, IFUXable, ERC1155HolderUpgradeable, OwnableUpgra
         external
         payable
     {
-        takeFUX(user, address(this), tokenAmount);
+        FUXStaking.takeFUX(user, address(this), tokenAmount);
     }
 
     function giveFUX(address user, address workstream, uint256 fuxGiven) public override isFuxable(FUX_CONTRACT) {
         if (workstream != address(this)) revert UnsupportedWorkstream();
+
         IFUXable(FUX_CONTRACT).giveFUX(user, workstream, fuxGiven);
+
         fuxStaked[user] += fuxGiven;
 
         emit UserCommitted(workstream, user, FUX_CONTRACT, 1, fuxGiven);
@@ -62,7 +66,9 @@ contract FUXStaking is ICommit, IFUXable, ERC1155HolderUpgradeable, OwnableUpgra
 
     function takeFUX(address user, address workstream, uint256 fuxTaken) public override isFuxable(FUX_CONTRACT) {
         if (workstream != address(this)) revert UnsupportedWorkstream();
+
         IFUXable(FUX_CONTRACT).takeFUX(user, workstream, fuxTaken);
+
         fuxStaked[user] -= fuxTaken;
 
         emit UserWithdrawn(workstream, user, FUX_CONTRACT, 1, fuxTaken);

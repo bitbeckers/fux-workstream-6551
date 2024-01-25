@@ -27,6 +27,11 @@ interface IWERK is ICoordinate, ICommit, IEvaluate, IDistribute, IFund {
         WorkstreamStatus status;
     }
 
+    struct WorkstreamPointer {
+        string name;
+        string uri;
+    }
+
     event WorkstreamCreated(address owner, address instance, uint256 tokenId);
     event WorkstreamStatusUpdated(address operator, address user, WorkstreamStatus status);
 

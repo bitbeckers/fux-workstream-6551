@@ -22,7 +22,7 @@ contract DeployStrategyRegistry is BaseScript {
         bytes32 _salt = keccak256("v0.6");
 
         // Strategies
-        FUXStaking fuxStaking = new FUXStaking{ salt: _salt }();
+        FUXStaking fuxStaking = new FUXStaking{ salt: _salt }(0xDBB776B586C2254f5228dfa368F9adc8D4Dcd8f1);
         AllowListCoordination allowListCoordination = new AllowListCoordination{ salt: _salt }();
         SimplePeerEvaluation simplePeerEvaluation = new SimplePeerEvaluation{ salt: _salt }();
         DirectDeposit directDeposit = new DirectDeposit{ salt: _salt }();

@@ -6,7 +6,7 @@ import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
-import { InsufficientFunds } from "../../libraries/Errors.sol";
+import { DelegateCallFailed } from "../../libraries/Errors.sol";
 
 contract SimpleDistribution is IDistribute, OwnableUpgradeable {
     address internal treasury;
@@ -24,19 +24,22 @@ contract SimpleDistribution is IDistribute, OwnableUpgradeable {
     }
 
     function distribute(bytes memory payoutData) external payable onlyOwner {
-        (address[] memory recipients, address[] memory tokens, uint256[] memory amounts) =
-            abi.decode(payoutData, (address[], address[], uint256[]));
+        (address[] memory recipients, address[] memory tokens, uint256[] memory tokenIds, uint256[] memory amounts) =
+            abi.decode(payoutData, (address[], address[], uint256[], uint256[]));
 
         for (uint256 i = 0; i < recipients.length; i++) {
             address recipient = recipients[i];
             address tokenAddress = tokens[i];
+            uint256 tokenId = tokenIds[i];
             uint256 tokenAmount = amounts[i];
 
-            (
-                address(uint160(treasury)).delegatecall(
-                    abi.encodeWithSignature("withdraw(address,address,uint256)", recipient, tokenAddress, tokenAmount)
+            (bool success,) = treasury.delegatecall(
+                abi.encodeWithSignature(
+                    "withdraw(address,address,uint256,uint256)", recipient, tokenAddress, tokenId, tokenAmount
                 )
             );
+
+            if (!success) revert DelegateCallFailed();
         }
 
         emit Distributed(msg.sender, payoutData);
