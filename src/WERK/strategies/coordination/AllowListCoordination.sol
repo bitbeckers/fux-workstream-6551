@@ -17,10 +17,10 @@ contract AllowListCoordination is ICoordinate, OwnableUpgradeable {
     }
 
     function setUp(bytes memory _initializationParams) public virtual initializer {
-        (address _workstreamAccount) = abi.decode(_initializationParams, (address));
+        (address _owner) = abi.decode(_initializationParams, (address));
 
-        coordinators[_workstreamAccount] = true;
-        __Ownable_init(_workstreamAccount);
+        coordinators[_owner] = true;
+        __Ownable_init(_owner);
     }
 
     function addContributors(

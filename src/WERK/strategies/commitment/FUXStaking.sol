@@ -24,10 +24,10 @@ contract FUXStaking is ICommit, IFUXable, ERC1155HolderUpgradeable, OwnableUpgra
     }
 
     function setUp(bytes memory _initializationParams) public virtual initializer {
-        (address _workstreamAccount) = abi.decode(_initializationParams, (address));
+        (address _owner) = abi.decode(_initializationParams, (address));
 
         __ERC1155Holder_init();
-        __Ownable_init(_workstreamAccount);
+        __Ownable_init(_owner);
     }
 
     function commit(

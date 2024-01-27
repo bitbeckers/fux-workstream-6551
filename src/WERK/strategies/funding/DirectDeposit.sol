@@ -9,7 +9,10 @@ import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/O
 import { InsufficientFunds, UnsupportedToken, CallFailed } from "../../libraries/Errors.sol";
 import { AcceptedToken } from "../../libraries/Structs.sol";
 
+import { IERC6551Executable } from "../../interfaces/IERC6551Executable.sol";
+
 contract DirectDeposit is IFund, OwnableUpgradeable {
+    address treasury;
     mapping(address tokenAddress => mapping(uint256 tokenId => bool isAccepted)) public acceptedTokens;
 
     /// @custom:oz-upgrades-unsafe-allow constructor
@@ -18,9 +21,10 @@ contract DirectDeposit is IFund, OwnableUpgradeable {
     }
 
     function setUp(bytes memory _initializationParams) public virtual initializer {
-        (address _workstreamAccount) = abi.decode(_initializationParams, (address));
+        (address _owner, address _treasury) = abi.decode(_initializationParams, (address, address));
 
-        __Ownable_init(_workstreamAccount);
+        treasury = _treasury;
+        __Ownable_init(_owner);
     }
 
     function setAcceptedTokens(AcceptedToken[] memory _acceptedTokens, bool accepted) external override onlyOwner {
@@ -46,7 +50,7 @@ contract DirectDeposit is IFund, OwnableUpgradeable {
         if (tokenAddress == address(0)) {
             if (msg.value > 0) {
                 if (msg.value != tokenAmount) revert InsufficientFunds();
-                (bool success,) = owner().call{ value: msg.value }("");
+                (bool success,) = treasury.call{ value: msg.value }("");
 
                 if (!success) revert CallFailed();
             } else {
@@ -54,7 +58,7 @@ contract DirectDeposit is IFund, OwnableUpgradeable {
             }
         } else {
             // Handle ERC20 token
-            IERC20(tokenAddress).transferFrom(user, owner(), tokenAmount);
+            IERC20(tokenAddress).transferFrom(user, treasury, tokenAmount);
         }
 
         emit FundsDeposited(user, tokenAddress, tokenId, tokenAmount);
@@ -73,10 +77,11 @@ contract DirectDeposit is IFund, OwnableUpgradeable {
     {
         // TODO improve handling so it supports both native, ERC20 and ERC1155
         if (tokenAddress == address(0)) {
-            payable(user).transfer(tokenAmount);
+            IERC6551Executable(treasury).execute(user, tokenAmount, "", 0);
         } else {
+            // TODO repalce with IERC6551 Executable transferFrom call on treasuryc (workstreamAccount)
             // Handle ERC20 token
-            IERC20(tokenAddress).transferFrom(address(this), user, tokenAmount);
+            IERC20(tokenAddress).transferFrom(treasury, user, tokenAmount);
         }
 
         emit FundsWithdrawn(user, tokenAddress, tokenId, tokenAmount);

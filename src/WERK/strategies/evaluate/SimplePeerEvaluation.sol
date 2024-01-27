@@ -19,9 +19,9 @@ contract SimplePeerEvaluation is IEvaluate, OwnableUpgradeable {
     }
 
     function setUp(bytes memory _initializationParams) public virtual initializer {
-        (address _workstreamAccount) = abi.decode(_initializationParams, (address));
+        (address _owner) = abi.decode(_initializationParams, (address));
 
-        __Ownable_init(_workstreamAccount);
+        __Ownable_init(_owner);
     }
 
     function submit(bytes memory _evaluationData) external {
@@ -48,7 +48,7 @@ contract SimplePeerEvaluation is IEvaluate, OwnableUpgradeable {
         emit EvaluationSubmitted(msg.sender, _evaluationData);
     }
 
-    function updateEvaluationStatus(EvaluationStatus _status) external onlyOwner() {
+    function updateEvaluationStatus(EvaluationStatus _status) external onlyOwner {
         evaluationStatus = _status;
         emit EvaluationStatusUpdated(_status);
     }

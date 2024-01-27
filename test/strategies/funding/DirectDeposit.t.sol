@@ -17,7 +17,7 @@ contract DirectDepositTest is Setup {
     function setUp() public {
         super.setup();
 
-        bytes memory _initializationParams = abi.encode(workstreamAccount);
+        bytes memory _initializationParams = abi.encode(owner, workstreamAccount);
         _directDeposit = DirectDeposit(getClone(address(directDeposit)));
         _directDeposit.setUp(_initializationParams);
 
@@ -28,12 +28,12 @@ contract DirectDepositTest is Setup {
         AcceptedToken[] memory _acceptedTokens = new AcceptedToken[](1);
         _acceptedTokens[0] = AcceptedToken(address(0), 0);
 
-        vm.prank(workstreamAccount);
+        vm.prank(owner);
         _directDeposit.setAcceptedTokens(_acceptedTokens, true);
 
         assertTrue(_directDeposit.acceptedTokens(address(0), 0));
 
-        vm.prank(workstreamAccount);
+        vm.prank(owner);
         _directDeposit.setAcceptedTokens(_acceptedTokens, false);
 
         assertFalse(_directDeposit.acceptedTokens(address(0), 0));
@@ -45,7 +45,7 @@ contract DirectDepositTest is Setup {
         uint256 _tokenId = 0;
         uint256 _tokenAmount = 1 ether;
 
-        uint256 _startBalance = address(workstreamAccount).balance;
+        uint256 _startBalance = address(owner).balance;
 
         vm.deal(_user, _tokenAmount);
 
@@ -62,7 +62,7 @@ contract DirectDepositTest is Setup {
         vm.expectRevert();
         _directDeposit.setAcceptedTokens(_acceptedTokens, true);
 
-        vm.prank(workstreamAccount);
+        vm.prank(owner);
         _directDeposit.setAcceptedTokens(_acceptedTokens, true);
 
         // Can't deposit without sending value
@@ -72,11 +72,10 @@ contract DirectDepositTest is Setup {
         vm.prank(_user);
         _directDeposit.deposit{ value: _tokenAmount }(_user, _tokenAddress, _tokenId, _tokenAmount);
 
-        assertEq(address(workstreamAccount).balance, _startBalance + _tokenAmount);
+        assertEq(address(owner).balance, _startBalance + _tokenAmount);
     }
 
     function testCanWithdraw() public {
-        address _user = workstreamAccount;
         address _tokenAddress = address(0);
         uint256 _tokenId = 0;
         uint256 _tokenAmount = 1 ether;
@@ -86,23 +85,26 @@ contract DirectDepositTest is Setup {
         AcceptedToken[] memory _acceptedTokens = new AcceptedToken[](1);
         _acceptedTokens[0] = AcceptedToken(_tokenAddress, _tokenId);
 
+        assertEq(address(workstreamAccount).balance, 10 ether);
+
         // Set accepted tokens
-        vm.startPrank(workstreamAccount);
+        vm.prank(owner);
         _directDeposit.setAcceptedTokens(_acceptedTokens, true);
 
-        _directDeposit.deposit{ value: _tokenAmount }(_user, _tokenAddress, _tokenId, _tokenAmount);
+        // Deposit funds
+        vm.deal(bob, 10 ether);
+        vm.prank(bob);
+        _directDeposit.deposit{ value: _tokenAmount }(bob, _tokenAddress, _tokenId, _tokenAmount);
 
-        vm.stopPrank();
-
-        assertEq(address(workstreamAccount).balance, _tokenAmount);
+        assertEq(address(workstreamAccount).balance, 10 ether + _tokenAmount);
 
         // Only owner can withdraw
         vm.prank(alice);
         vm.expectRevert();
         _directDeposit.withdraw(alice, _tokenAddress, _tokenId, _tokenAmount);
 
-        vm.prank(workstreamAccount);
-        _directDeposit.withdraw(_user, _tokenAddress, _tokenId, _tokenAmount);
+        vm.prank(owner);
+        _directDeposit.withdraw(alice, _tokenAddress, _tokenId, _tokenAmount);
 
         assertEq(address(workstreamAccount).balance, 0);
     }
