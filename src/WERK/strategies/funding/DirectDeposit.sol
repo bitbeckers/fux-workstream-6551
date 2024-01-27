@@ -12,7 +12,7 @@ import { AcceptedToken } from "../../libraries/Structs.sol";
 import { IERC6551Executable } from "../../interfaces/IERC6551Executable.sol";
 
 contract DirectDeposit is IFund, OwnableUpgradeable {
-    address treasury;
+    address public treasury;
     mapping(address tokenAddress => mapping(uint256 tokenId => bool isAccepted)) public acceptedTokens;
 
     /// @custom:oz-upgrades-unsafe-allow constructor

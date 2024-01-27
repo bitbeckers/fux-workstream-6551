@@ -11,13 +11,18 @@ import { CallFailed, UnsupportedToken } from "../../../src/WERK/libraries/Errors
 import { IFund } from "../../../src/WERK/interfaces/IFund.sol";
 import { AcceptedToken } from "../../../src/WERK/libraries/Structs.sol";
 
+import { MockExecutableCall } from "../../mocks/MockExecutableCall.sol";
+
 contract DirectDepositTest is Setup {
     DirectDeposit public _directDeposit;
+    MockExecutableCall public _mockExecutableCall;
 
     function setUp() public {
         super.setup();
 
-        bytes memory _initializationParams = abi.encode(owner, workstreamAccount);
+        _mockExecutableCall = new MockExecutableCall();
+
+        bytes memory _initializationParams = abi.encode(owner, address(_mockExecutableCall));
         _directDeposit = DirectDeposit(getClone(address(directDeposit)));
         _directDeposit.setUp(_initializationParams);
 
@@ -45,7 +50,7 @@ contract DirectDepositTest is Setup {
         uint256 _tokenId = 0;
         uint256 _tokenAmount = 1 ether;
 
-        uint256 _startBalance = address(owner).balance;
+        assertEq(_directDeposit.treasury().balance, 0);
 
         vm.deal(_user, _tokenAmount);
 
@@ -72,7 +77,7 @@ contract DirectDepositTest is Setup {
         vm.prank(_user);
         _directDeposit.deposit{ value: _tokenAmount }(_user, _tokenAddress, _tokenId, _tokenAmount);
 
-        assertEq(address(owner).balance, _startBalance + _tokenAmount);
+        assertEq(_directDeposit.treasury().balance, _tokenAmount);
     }
 
     function testCanWithdraw() public {
@@ -85,7 +90,7 @@ contract DirectDepositTest is Setup {
         AcceptedToken[] memory _acceptedTokens = new AcceptedToken[](1);
         _acceptedTokens[0] = AcceptedToken(_tokenAddress, _tokenId);
 
-        assertEq(address(workstreamAccount).balance, 10 ether);
+        assertEq(_directDeposit.treasury().balance, 0 ether);
 
         // Set accepted tokens
         vm.prank(owner);
@@ -96,7 +101,7 @@ contract DirectDepositTest is Setup {
         vm.prank(bob);
         _directDeposit.deposit{ value: _tokenAmount }(bob, _tokenAddress, _tokenId, _tokenAmount);
 
-        assertEq(address(workstreamAccount).balance, 10 ether + _tokenAmount);
+        assertEq(_directDeposit.treasury().balance, _tokenAmount);
 
         // Only owner can withdraw
         vm.prank(alice);
@@ -106,6 +111,6 @@ contract DirectDepositTest is Setup {
         vm.prank(owner);
         _directDeposit.withdraw(alice, _tokenAddress, _tokenId, _tokenAmount);
 
-        assertEq(address(workstreamAccount).balance, 0);
+        assertEq(_directDeposit.treasury().balance, 0);
     }
 }
