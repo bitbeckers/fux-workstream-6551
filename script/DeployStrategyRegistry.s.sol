@@ -15,6 +15,7 @@ import { StrategyRegistry } from "../src/WERK/StrategyRegistry.sol";
 import { IStrategyRegistry } from "../src/WERK/interfaces/IStrategyRegistry.sol";
 
 import { BaseScript } from "./Base.s.sol";
+import { StrategyTypes } from "../src/WERK/libraries/Enums.sol";
 
 /// @dev See the Solidity Scripting tutorial: https://book.getfoundry.sh/tutorials/solidity-scripting
 contract DeployStrategyRegistry is BaseScript {
@@ -32,16 +33,14 @@ contract DeployStrategyRegistry is BaseScript {
         StrategyRegistry strategyRegistry = new StrategyRegistry{ salt: _salt }(broadcaster);
 
         // Strategy Registry: Create Strategies
-        strategyRegistry.createStrategy(IStrategyRegistry.StrategyTypes.Commit, address(fuxStaking), true);
+        strategyRegistry.createStrategy(StrategyTypes.Commit, address(fuxStaking), true);
 
-        strategyRegistry.createStrategy(
-            IStrategyRegistry.StrategyTypes.Coordinate, address(allowListCoordination), true
-        );
+        strategyRegistry.createStrategy(StrategyTypes.Coordinate, address(allowListCoordination), true);
 
-        strategyRegistry.createStrategy(IStrategyRegistry.StrategyTypes.Evaluate, address(simplePeerEvaluation), true);
+        strategyRegistry.createStrategy(StrategyTypes.Evaluate, address(simplePeerEvaluation), true);
 
-        strategyRegistry.createStrategy(IStrategyRegistry.StrategyTypes.Fund, address(directDeposit), true);
+        strategyRegistry.createStrategy(StrategyTypes.Fund, address(directDeposit), true);
 
-        strategyRegistry.createStrategy(IStrategyRegistry.StrategyTypes.Payout, address(simpleDistribution), true);
+        strategyRegistry.createStrategy(StrategyTypes.Payout, address(simpleDistribution), true);
     }
 }

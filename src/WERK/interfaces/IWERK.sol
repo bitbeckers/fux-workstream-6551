@@ -8,7 +8,7 @@ import { IDistribute } from "./IDistribute.sol";
 import { IEvaluate } from "./IEvaluate.sol";
 import { IFund } from "./IFund.sol";
 
-interface IWERK is ICoordinate, ICommit, IEvaluate, IDistribute, IFund {
+interface IWERK {
     enum WorkstreamStatus {
         Pending,
         Active,
@@ -41,4 +41,14 @@ interface IWERK is ICoordinate, ICommit, IEvaluate, IDistribute, IFund {
     function getWerkInfo() external view returns (WerkInfo memory);
 
     function updateWorkstreamStatus(WorkstreamStatus status) external;
+
+    function coordinate(bytes memory coordinationCallData) external;
+
+    function commit(bytes memory commitmentCallData) external;
+
+    function evaluate(bytes memory evaluationCallData) external;
+
+    function fund(bytes memory fundingCallData) external;
+
+    function distribute(bytes memory distributionCallData) external;
 }

@@ -11,14 +11,17 @@ import { ERC165Checker } from "@openzeppelin/contracts/utils/introspection/ERC16
 
 import { CallFailed, UnsupportedToken, UnsupportedWorkstream } from "../../libraries/Errors.sol";
 import { Commitment } from "../../libraries/Structs.sol";
+import { StrategyTypes } from "../../libraries/Enums.sol";
+
+import { IERC165 } from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 
 contract FUXStaking is ICommit, IFUXable, ERC1155HolderUpgradeable, OwnableUpgradeable {
-    address public immutable FUX_CONTRACT;
+    address public immutable fuxContract;
     mapping(address user => uint256 fuxStaked) public fuxStaked;
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor(address _fuxContract) {
-        FUX_CONTRACT = _fuxContract;
+        fuxContract = _fuxContract;
 
         _disableInitializers();
     }
@@ -54,34 +57,44 @@ contract FUXStaking is ICommit, IFUXable, ERC1155HolderUpgradeable, OwnableUpgra
         FUXStaking.takeFUX(user, address(this), tokenAmount);
     }
 
-    function giveFUX(address user, address workstream, uint256 fuxGiven) public override isFuxable(FUX_CONTRACT) {
+    function giveFUX(address user, address workstream, uint256 fuxGiven) public override isFuxable(fuxContract) {
         if (workstream != address(this)) revert UnsupportedWorkstream();
 
-        IFUXable(FUX_CONTRACT).giveFUX(user, workstream, fuxGiven);
+        IFUXable(fuxContract).giveFUX(user, workstream, fuxGiven);
 
         fuxStaked[user] += fuxGiven;
 
-        emit UserCommitted(workstream, user, FUX_CONTRACT, 1, fuxGiven);
+        emit UserCommitted(workstream, user, fuxContract, 1, fuxGiven);
     }
 
-    function takeFUX(address user, address workstream, uint256 fuxTaken) public override isFuxable(FUX_CONTRACT) {
+    function takeFUX(address user, address workstream, uint256 fuxTaken) public override isFuxable(fuxContract) {
         if (workstream != address(this)) revert UnsupportedWorkstream();
 
-        IFUXable(FUX_CONTRACT).takeFUX(user, workstream, fuxTaken);
+        IFUXable(fuxContract).takeFUX(user, workstream, fuxTaken);
 
         fuxStaked[user] -= fuxTaken;
 
-        emit UserWithdrawn(workstream, user, FUX_CONTRACT, 1, fuxTaken);
+        emit UserWithdrawn(workstream, user, fuxContract, 1, fuxTaken);
     }
 
     function getCommitments(address user) external view override returns (Commitment[] memory) {
         Commitment[] memory commitments = new Commitment[](1);
-        commitments[0] = Commitment(user, FUX_CONTRACT, 0, fuxStaked[user]);
+        commitments[0] = Commitment(user, fuxContract, 0, fuxStaked[user]);
         return commitments;
     }
 
-    function supportsInterface(bytes4 interfaceId) public view override returns (bool) {
-        return interfaceId == type(IFUXable).interfaceId || super.supportsInterface(interfaceId);
+    function getStrategyType() external pure override returns (StrategyTypes) {
+        return StrategyTypes.Commit;
+    }
+
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        override(IERC165, ERC1155HolderUpgradeable)
+        returns (bool)
+    {
+        return interfaceId == type(IFUXable).interfaceId || interfaceId == type(ICommit).interfaceId
+            || super.supportsInterface(interfaceId);
     }
 
     modifier isFuxable(address _contract) {

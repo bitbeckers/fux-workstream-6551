@@ -3,10 +3,10 @@
 pragma solidity ^0.8.23;
 
 /// @notice This error is emitted when a call to a function fails.
-error CallFailed();
+error CallFailed(bytes returnData);
 
 /// @notice This error is emitted when a delegate call to a function fails.
-error DelegateCallFailed();
+error DelegateCallFailed(bytes returnData);
 
 /// @notice This error is emitted when there are insufficient funds for a transaction.
 error InsufficientFunds();

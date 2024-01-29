@@ -12,27 +12,31 @@ import { CallFailed, UnsupportedToken } from "../../../src/WERK/libraries/Errors
 import { IDistribute } from "../../../src/WERK/interfaces/IDistribute.sol";
 import { AcceptedToken } from "../../../src/WERK/libraries/Structs.sol";
 
+import { MockExecutableCall } from "../../mocks/MockExecutableCall.sol";
+
 contract SimpleDistributionTest is Setup {
     DirectDeposit public _directDeposit;
     SimpleDistribution public _simpleDistribution;
 
+    MockExecutableCall public _mockExecutableCall;
+
     function setUp() public {
         super.setup();
 
-        bytes memory _initializationParams = abi.encode(workstreamAccount);
+        _mockExecutableCall = new MockExecutableCall();
 
-        _directDeposit = DirectDeposit(getClone(address(directDeposit)));
-        _directDeposit.setUp(_initializationParams);
+        bytes memory _initializationParams = abi.encode(owner, address(_mockExecutableCall));
 
-        _initializationParams = abi.encode(workstreamAccount, address(_directDeposit));
         _simpleDistribution = SimpleDistribution(getClone(address(simpleDistribution)));
         _simpleDistribution.setUp(_initializationParams);
 
-        vm.deal(workstreamAccount, 10 ether);
+        vm.deal(owner, 10 ether);
     }
 
     function testCanDistribute() public {
-        vm.startPrank(workstreamAccount);
+        assertEq(address(_mockExecutableCall).balance, 0 ether);
+
+        vm.deal(address(_mockExecutableCall), 10 ether);
 
         assertEq(address(alice).balance, 0 ether);
         assertEq(address(bob).balance, 0 ether);
@@ -50,24 +54,18 @@ contract SimpleDistributionTest is Setup {
         _tokenIds[1] = 0;
 
         uint256[] memory _amounts = new uint256[](2);
-        _amounts[0] = 1 ether;
-        _amounts[1] = 1 ether;
+        _amounts[0] = 7 ether;
+        _amounts[1] = 3 ether;
 
         bytes memory _distributionData = abi.encode(_recipients, _tokens, _tokenIds, _amounts);
 
         AcceptedToken[] memory _acceptedTokens = new AcceptedToken[](1);
         _acceptedTokens[0] = AcceptedToken(address(0), 0);
 
-        _directDeposit.setAcceptedTokens(_acceptedTokens, true);
-        _directDeposit.deposit{ value: 3 ether }(workstreamAccount, address(0), 0, 3 ether);
-
-        assertEq(address(_directDeposit).balance, 3 ether);
-
+        vm.prank(owner);
         _simpleDistribution.distribute(_distributionData);
 
-        vm.stopPrank();
-
-        assertEq(address(alice).balance, 1 ether);
-        assertEq(address(bob).balance, 1 ether);
+        assertEq(address(alice).balance, 7 ether);
+        assertEq(address(bob).balance, 3 ether);
     }
 }

@@ -4,9 +4,9 @@ pragma solidity ^0.8.23;
 import { Setup } from "./Setup.t.sol";
 import { StrategyRegistry } from "../src/WERK/StrategyRegistry.sol";
 
-import "forge-std/src/console.sol";
-
 import { IStrategyRegistry } from "../src/WERK/interfaces/IStrategyRegistry.sol";
+
+import { StrategyTypes } from "../src/WERK/libraries/Enums.sol";
 
 contract StrategyRegistryTest is Setup {
     function setUp() public {
@@ -22,7 +22,7 @@ contract StrategyRegistryTest is Setup {
     // }
 
     function testCanCreateStrategy() public {
-        IStrategyRegistry.StrategyTypes strategyType = IStrategyRegistry.StrategyTypes.Commit;
+        StrategyTypes strategyType = StrategyTypes.Commit;
         address implementation = address(fuxStaking);
         bool isActive = true;
 
@@ -41,7 +41,7 @@ contract StrategyRegistryTest is Setup {
     }
 
     function testCanUpdateStrategy() public {
-        IStrategyRegistry.StrategyTypes strategyType = IStrategyRegistry.StrategyTypes.Commit;
+        StrategyTypes strategyType = StrategyTypes.Commit;
         address implementation = address(fuxStaking);
         bool isActive = true;
 

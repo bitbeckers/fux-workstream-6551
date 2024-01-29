@@ -21,6 +21,7 @@ contract Setup is PRBTest, StdCheats {
     address public owner = makeAddr("owner");
     address public alice = makeAddr("alice");
     address public bob = makeAddr("bob");
+    address public anon = makeAddr("anon");
     FUX public fux;
 
     WERKImplementation public werkImplementation;

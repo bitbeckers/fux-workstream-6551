@@ -7,9 +7,14 @@ import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/O
 
 import { NotApprovedOrOwner } from "../../libraries/Errors.sol";
 
+import { StrategyTypes } from "../../libraries/Enums.sol";
+
 contract AllowListCoordination is ICoordinate, OwnableUpgradeable {
     mapping(address user => bool isCoordinator) public coordinators;
     mapping(address user => bool isContributor) public contributors;
+
+    event ContributorsAdded(address[] contributors, bytes data);
+    event ContributorsRemoved(address[] contributors, bytes data);
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
@@ -23,28 +28,14 @@ contract AllowListCoordination is ICoordinate, OwnableUpgradeable {
         __Ownable_init(_owner);
     }
 
-    function addContributors(
-        address[] memory _contributors,
-        bytes memory data
-    )
-        external
-        override
-        onlyCoordinatorOrOwner
-    {
+    function addContributors(address[] memory _contributors, bytes memory data) external onlyCoordinatorOrOwner {
         for (uint256 i = 0; i < _contributors.length; i++) {
             contributors[_contributors[i]] = true;
         }
         emit ContributorsAdded(_contributors, data);
     }
 
-    function removeContributors(
-        address[] memory _contributors,
-        bytes memory data
-    )
-        external
-        override
-        onlyCoordinatorOrOwner
-    {
+    function removeContributors(address[] memory _contributors, bytes memory data) external onlyCoordinatorOrOwner {
         for (uint256 i = 0; i < _contributors.length; i++) {
             contributors[_contributors[i]] = false;
         }
@@ -79,12 +70,20 @@ contract AllowListCoordination is ICoordinate, OwnableUpgradeable {
         emit CoordinatorsRemoved(_coordinators, data);
     }
 
-    function isContributor(address _contributor) external view override returns (bool) {
+    function isContributor(address _contributor) external view returns (bool) {
         return contributors[_contributor];
     }
 
-    function isCoordinator(address _coordinator) external view override returns (bool) {
+    function isCoordinator(address _coordinator) external view returns (bool) {
         return coordinators[_coordinator];
+    }
+
+    function getStrategyType() external pure returns (StrategyTypes) {
+        return StrategyTypes.Commit;
+    }
+
+    function supportsInterface(bytes4 interfaceId) public pure returns (bool) {
+        return interfaceId == type(ICoordinate).interfaceId;
     }
 
     modifier onlyCoordinatorOrOwner() {

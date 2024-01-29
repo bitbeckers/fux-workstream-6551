@@ -2,10 +2,11 @@
 pragma solidity ^0.8.23;
 
 import { Commitment } from "../libraries/Structs.sol";
+import { IWERKStrategy } from "./IWERKStrategy.sol";
 
 /// @title ICommit
 /// @dev This is a generic interface for a commitment strategy.
-interface ICommit {
+interface ICommit is IWERKStrategy {
     /// @notice This event is emitted when a user commits tokens.
     /// @param workstream The address of the workstream.
     /// @param user The address of the user.

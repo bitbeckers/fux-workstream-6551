@@ -5,6 +5,8 @@ import { IEvaluate } from "../../interfaces/IEvaluate.sol";
 
 import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
+import { StrategyTypes } from "../../libraries/Enums.sol";
+
 contract SimplePeerEvaluation is IEvaluate, OwnableUpgradeable {
     EvaluationStatus public evaluationStatus;
     mapping(address user => bytes evaluationData) public evaluationData;
@@ -78,5 +80,13 @@ contract SimplePeerEvaluation is IEvaluate, OwnableUpgradeable {
                 ++i;
             }
         }
+    }
+
+    function getStrategyType() external pure returns (StrategyTypes) {
+        return StrategyTypes.Evaluate;
+    }
+
+    function supportsInterface(bytes4 interfaceId) public pure returns (bool) {
+        return interfaceId == type(IEvaluate).interfaceId;
     }
 }

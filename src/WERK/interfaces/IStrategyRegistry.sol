@@ -1,15 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.23;
 
-interface IStrategyRegistry {
-    enum StrategyTypes {
-        Coordinate,
-        Commit,
-        Fund,
-        Evaluate,
-        Payout
-    }
+import { StrategyTypes } from "../libraries/Enums.sol";
 
+interface IStrategyRegistry {
     struct StrategyInfo {
         StrategyTypes strategyType;
         bytes32 strategyId;

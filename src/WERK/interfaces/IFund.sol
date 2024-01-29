@@ -2,10 +2,11 @@
 pragma solidity ^0.8.23;
 
 import { AcceptedToken } from "../libraries/Structs.sol";
+import { IWERKStrategy } from "./IWERKStrategy.sol";
 
 /// @title IFund
 /// @dev This is a generic interface for a fund management strategy.
-interface IFund {
+interface IFund is IWERKStrategy {
     /// @notice This event is emitted when the accepted tokens are updated.
     /// @param acceptedTokens The array of accepted tokens.
     /// @param accepted A boolean indicating whether the tokens are accepted.

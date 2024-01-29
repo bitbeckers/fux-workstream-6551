@@ -8,6 +8,10 @@ import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/O
 
 import { DelegateCallFailed } from "../../libraries/Errors.sol";
 
+import { IERC6551Executable } from "../../interfaces/IERC6551Executable.sol";
+
+import { StrategyTypes } from "../../libraries/Enums.sol";
+
 contract SimpleDistribution is IDistribute, OwnableUpgradeable {
     address internal treasury;
 
@@ -17,10 +21,10 @@ contract SimpleDistribution is IDistribute, OwnableUpgradeable {
     }
 
     function setUp(bytes memory _initializationParams) public virtual initializer {
-        (address _workstreamAccount, address _treasury) = abi.decode(_initializationParams, (address, address));
+        (address _owner, address _treasury) = abi.decode(_initializationParams, (address, address));
 
         treasury = _treasury;
-        __Ownable_init(_workstreamAccount);
+        __Ownable_init(_owner);
     }
 
     function distribute(bytes memory payoutData) external payable onlyOwner {
@@ -33,15 +37,24 @@ contract SimpleDistribution is IDistribute, OwnableUpgradeable {
             uint256 tokenId = tokenIds[i];
             uint256 tokenAmount = amounts[i];
 
-            (bool success,) = treasury.delegatecall(
-                abi.encodeWithSignature(
-                    "withdraw(address,address,uint256,uint256)", recipient, tokenAddress, tokenId, tokenAmount
-                )
-            );
-
-            if (!success) revert DelegateCallFailed();
+            // TODO improve handling so it supports both native, ERC20 and ERC1155
+            if (tokenAddress == address(0)) {
+                IERC6551Executable(treasury).execute(recipient, tokenAmount, "", 0);
+            } else {
+                // TODO repalce with IERC6551 Executable transferFrom call on treasuryc (workstreamAccount)
+                // Handle ERC20 token
+                IERC20(tokenAddress).transferFrom(treasury, recipient, tokenAmount);
+            }
         }
 
         emit Distributed(msg.sender, payoutData);
+    }
+
+    function getStrategyType() external pure returns (StrategyTypes) {
+        return StrategyTypes.Payout;
+    }
+
+    function supportsInterface(bytes4 interfaceId) public pure returns (bool) {
+        return interfaceId == type(IDistribute).interfaceId;
     }
 }

@@ -4,6 +4,8 @@ pragma solidity ^0.8.23;
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { IStrategyRegistry } from "./interfaces/IStrategyRegistry.sol";
 
+import { StrategyTypes } from "./libraries/Enums.sol";
+
 contract StrategyRegistry is IStrategyRegistry, Ownable {
     mapping(bytes32 strategyId => StrategyInfo strategy) public strategies;
 

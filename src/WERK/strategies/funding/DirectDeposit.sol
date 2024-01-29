@@ -11,6 +11,8 @@ import { AcceptedToken } from "../../libraries/Structs.sol";
 
 import { IERC6551Executable } from "../../interfaces/IERC6551Executable.sol";
 
+import { StrategyTypes } from "../../libraries/Enums.sol";
+
 contract DirectDeposit is IFund, OwnableUpgradeable {
     address public treasury;
     mapping(address tokenAddress => mapping(uint256 tokenId => bool isAccepted)) public acceptedTokens;
@@ -50,9 +52,9 @@ contract DirectDeposit is IFund, OwnableUpgradeable {
         if (tokenAddress == address(0)) {
             if (msg.value > 0) {
                 if (msg.value != tokenAmount) revert InsufficientFunds();
-                (bool success,) = treasury.call{ value: msg.value }("");
+                (bool success, bytes memory returnData) = treasury.call{ value: msg.value }("");
 
-                if (!success) revert CallFailed();
+                if (!success) revert CallFailed(returnData);
             } else {
                 revert InsufficientFunds();
             }
@@ -89,5 +91,13 @@ contract DirectDeposit is IFund, OwnableUpgradeable {
 
     function isAcceptedToken(address tokenAddress, uint256 tokenId) external view override returns (bool) {
         return acceptedTokens[tokenAddress][tokenId];
+    }
+
+    function getStrategyType() external pure returns (StrategyTypes) {
+        return StrategyTypes.Fund;
+    }
+
+    function supportsInterface(bytes4 interfaceId) public view override returns (bool) {
+        return interfaceId == type(IFund).interfaceId;
     }
 }

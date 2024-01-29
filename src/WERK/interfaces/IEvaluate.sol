@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.23;
 
-interface IEvaluate {
+import { IWERKStrategy } from "./IWERKStrategy.sol";
+
+interface IEvaluate is IWERKStrategy {
     enum EvaluationStatus {
         CLOSED,
         OPEN,
