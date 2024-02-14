@@ -15,6 +15,11 @@ import { IWERK } from "../src/WERK/interfaces/IWERK.sol";
 
 import { SimplePeerEvaluation } from "../src/WERK/strategies/evaluate/SimplePeerEvaluation.sol";
 import { AllowListCoordination } from "../src/WERK/strategies/coordination/AllowListCoordination.sol";
+import { NotAllowedOrApproved } from "../src/WERK/libraries/Errors.sol";
+
+import { MockCommit } from "./mocks/MockCommit.sol";
+import { MockCoordinate } from "./mocks/MockCoordinate.sol";
+import { MockEvaluate } from "./mocks/MockEvaluate.sol";
 
 contract WERKImplementationTest is Setup {
     WERKImplementation public _werkImplementation;
@@ -31,14 +36,14 @@ contract WERKImplementationTest is Setup {
 
         _werkImplementation = WERKImplementation(getClone(address(werkImplementation)));
 
-        bytes memory _initializationParams = abi.encode(address(_werkImplementation));
-        _commitmentStrategy = ICommit(getClone(address(fuxStaking)));
+        bytes memory _initializationParams = abi.encode(owner);
+        _commitmentStrategy = ICommit(address(new MockCommit()));
         _commitmentStrategy.setUp(_initializationParams);
 
-        _coordinationStrategy = ICoordinate(getClone(address(allowListCoordination)));
+        _coordinationStrategy = ICoordinate(address(new MockCoordinate()));
         _coordinationStrategy.setUp(_initializationParams);
 
-        _evaluationStrategy = IEvaluate(getClone(address(simplePeerEvaluation)));
+        _evaluationStrategy = IEvaluate(address(new MockEvaluate()));
         _evaluationStrategy.setUp(_initializationParams);
 
         _initializationParams = abi.encode(address(_werkImplementation), treasury);
@@ -102,6 +107,13 @@ contract WERKImplementationTest is Setup {
         assertEq(werkInfo.evaluationStrategy, address(_evaluationStrategy));
         assertEq(werkInfo.fundingStrategy, address(_fundingStrategy));
         assertEq(werkInfo.payoutStrategy, address(_payoutStrategy));
+
+        vm.startPrank(owner);
+        _werkImplementation.updateWorkstreamStatus(IWERK.WorkstreamStatus.Active);
+
+        vm.expectRevert(NotAllowedOrApproved.selector);
+        _werkImplementation.coordinate("");
+        vm.stopPrank();
     }
 
     function testCannotExecuteOnInactiveWorkstream() public {
@@ -135,18 +147,32 @@ contract WERKImplementationTest is Setup {
         _coordinators[1] = bob;
 
         bytes memory callData =
-            abi.encodeWithSelector(AllowListCoordination.addCoordinators.selector, _coordinators, true);
+            abi.encodeWithSelector(AllowListCoordination.addCoordinators.selector, _coordinators, "");
 
         vm.prank(anon);
         vm.expectRevert();
         _werkImplementation.coordinate(callData);
 
         vm.expectEmit();
-
-        // event CoordinatorsAdded(address[] coordinators, bytes data);
         emit ICoordinate.CoordinatorsAdded(_coordinators, "");
         vm.prank(owner);
         _werkImplementation.coordinate(callData);
+    }
+
+    function testCanExecuteOwnerCommitCall() public {
+        initActiveWorkstream();
+
+        assertEq(_werkImplementation.owner(), owner);
+        bytes memory callData = abi.encodeWithSelector(ICommit.commit.selector, "");
+
+        vm.prank(anon);
+        vm.expectRevert();
+        _werkImplementation.commit(callData);
+
+        vm.expectEmit();
+        emit ICommit.UserCommitted(address(_werkImplementation), owner, address(0), 0, 0);
+        vm.prank(owner);
+        _werkImplementation.commit(callData);
     }
 
     function initWorkstream() internal {

@@ -97,6 +97,12 @@ contract WERKImplementation is IWERK, OwnableUpgradeable {
         if (!success) revert CallFailed(returnData);
     }
 
+    function unsafeExecute(bytes memory _callData, address _target) external onlyOwner {
+        (bool success, bytes memory returnData) = _target.call(_callData);
+
+        if (!success) revert CallFailed(returnData);
+    }
+
     // WERK
 
     function getWerkInfo() external view returns (WerkInfo memory werk) {

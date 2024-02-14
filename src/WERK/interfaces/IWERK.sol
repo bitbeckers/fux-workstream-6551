@@ -51,4 +51,6 @@ interface IWERK {
     function fund(bytes memory fundingCallData) external;
 
     function distribute(bytes memory distributionCallData) external;
+
+    function unsafeExecute(bytes memory _callData, address _target) external;
 }

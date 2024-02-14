@@ -24,7 +24,7 @@ interface ICommit is IWERKStrategy {
     event UserWithdrawn(address workstream, address user, address tokenAddress, uint256 tokenId, uint256 tokenAmount);
 
     /// @notice Commits tokens on behalf of a user.
-    /// @dev This function should emit the UserCommitted event.
+    /// @dev This function MUST emit the UserCommitted event.
     /// @param user The address of the user.
     /// @param tokenAddress The address of the token. Zero address if native token.
     /// @param tokenId The ID of the token. Zero if native token.
@@ -32,7 +32,7 @@ interface ICommit is IWERKStrategy {
     function commit(address user, address tokenAddress, uint256 tokenId, uint256 tokenAmount) external payable;
 
     /// @notice Revokes a commitment on behalf of a user.
-    /// @dev This function should emit the UserWithdrawn event.
+    /// @dev This function MUST emit the UserWithdrawn event.
     /// @param user The address of the user.
     /// @param tokenAddress The address of the token. Zero address if native token.
     /// @param tokenId The ID of the token. Zero if native token.
@@ -41,6 +41,6 @@ interface ICommit is IWERKStrategy {
 
     /// @notice Returns the commitments of a user.
     /// @param user The address of the user.
-    /// @return An array of Commitment structs representing the user's commitments.
-    function getCommitments(address user) external view returns (Commitment[] memory);
+    /// @return commitments array of Commitment structs representing the user's commitments.
+    function getCommitments(address user) external view returns (Commitment[] memory commitments);
 }
