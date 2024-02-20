@@ -10,6 +10,7 @@ import { CallFailed, UnsupportedToken } from "../../../src/WERK/libraries/Errors
 
 import { IFund } from "../../../src/WERK/interfaces/IFund.sol";
 import { AcceptedToken } from "../../../src/WERK/libraries/Structs.sol";
+import { TokenType } from "../../../src/WERK/libraries/Enums.sol";
 
 import { MockExecutableCall } from "../../mocks/MockExecutableCall.sol";
 
@@ -31,7 +32,7 @@ contract DirectDepositTest is Setup {
 
     function testCanUpdateAcceptedTokens() public {
         AcceptedToken[] memory _acceptedTokens = new AcceptedToken[](1);
-        _acceptedTokens[0] = AcceptedToken(address(0), 0);
+        _acceptedTokens[0] = AcceptedToken(TokenType.NATIVE, address(0), 0);
 
         vm.prank(owner);
         _directDeposit.setAcceptedTokens(_acceptedTokens, true);
@@ -57,7 +58,7 @@ contract DirectDepositTest is Setup {
         assertFalse(_directDeposit.acceptedTokens(_tokenAddress, _tokenId));
 
         AcceptedToken[] memory _acceptedTokens = new AcceptedToken[](1);
-        _acceptedTokens[0] = AcceptedToken(_tokenAddress, _tokenId);
+        _acceptedTokens[0] = AcceptedToken(TokenType.NATIVE, _tokenAddress, _tokenId);
 
         // Can't deposit unsupported token
         vm.expectRevert(UnsupportedToken.selector);
@@ -88,7 +89,7 @@ contract DirectDepositTest is Setup {
         assertFalse(_directDeposit.acceptedTokens(_tokenAddress, _tokenId));
 
         AcceptedToken[] memory _acceptedTokens = new AcceptedToken[](1);
-        _acceptedTokens[0] = AcceptedToken(_tokenAddress, _tokenId);
+        _acceptedTokens[0] = AcceptedToken(TokenType.NATIVE, _tokenAddress, _tokenId);
 
         assertEq(_directDeposit.treasury().balance, 0 ether);
 

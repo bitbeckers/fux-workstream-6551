@@ -18,8 +18,8 @@ interface ICoordinate is IWERKStrategy {
 
     /// @notice Checks if an address is a coordinator.
     /// @param _coordinator The address to check.
-    /// @return A boolean indicating whether the address is a coordinator.
-    function isCoordinator(address _coordinator) external view returns (bool);
+    /// @return isTrue A boolean indicating whether the address is a coordinator.
+    function isCoordinator(address _coordinator) external view returns (bool isTrue);
 
     /// @notice Adds coordinators.
     /// @param _coordinators The addresses of the coordinators to add.

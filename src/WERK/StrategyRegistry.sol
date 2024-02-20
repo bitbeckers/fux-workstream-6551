@@ -6,12 +6,18 @@ import { IStrategyRegistry } from "./interfaces/IStrategyRegistry.sol";
 
 import { StrategyTypes } from "./libraries/Enums.sol";
 
+/// @title StrategyRegistry
+/// @dev This contract allows the owner to create and update strategies.
 contract StrategyRegistry is IStrategyRegistry, Ownable {
-    mapping(bytes32 strategyId => StrategyInfo strategy) public strategies;
+    /// @dev Maps strategy IDs to their information.
+    mapping(bytes32 => StrategyInfo) public strategies;
 
-    // solhint-disable-next-line no-empty-blocks
+    /// @notice Creates a new instance of StrategyRegistry.
+    /// @param owner The initial owner of the contract.
     constructor(address owner) Ownable(owner) { }
 
+    /// @notice Can only be called by the contract owner.
+    /// @inheritdoc IStrategyRegistry
     function createStrategy(
         StrategyTypes strategyType,
         address implementation,
@@ -21,25 +27,26 @@ contract StrategyRegistry is IStrategyRegistry, Ownable {
         onlyOwner
         returns (bytes32 strategyId)
     {
-        bytes32 salt = keccak256(abi.encodePacked(strategyType, implementation));
+        strategyId = keccak256(abi.encodePacked(strategyType, implementation));
 
-        if (strategies[salt].implementation != address(0)) {
-            return salt;
+        if (strategies[strategyId].implementation != address(0)) {
+            return strategyId;
         }
 
-        strategies[salt] = StrategyInfo(strategyType, salt, implementation, isActive);
+        strategies[strategyId] = StrategyInfo(strategyType, strategyId, implementation, isActive);
 
-        emit StrategyCreated(strategyType, salt, implementation, isActive);
-
-        return salt;
+        emit StrategyCreated(strategyType, strategyId, implementation, isActive);
     }
 
+    /// @notice Can only be called by the contract owner.
+    /// @inheritdoc IStrategyRegistry
     function updateStrategy(bytes32 strategyId, bool isActive) external onlyOwner {
         strategies[strategyId].isActive = isActive;
 
         emit StrategyUpdated(strategyId, isActive);
     }
 
+    /// @inheritdoc IStrategyRegistry
     function getStrategy(bytes32 strategyId) external view returns (StrategyInfo memory strategyInfo) {
         return strategies[strategyId];
     }

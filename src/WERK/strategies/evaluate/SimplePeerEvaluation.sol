@@ -6,6 +6,8 @@ import { IEvaluate } from "../../interfaces/IEvaluate.sol";
 import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 import { StrategyTypes } from "../../libraries/Enums.sol";
+import { IWERKStrategy } from "../../interfaces/IWERKStrategy.sol";
+import { IERC165 } from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 
 contract SimplePeerEvaluation is IEvaluate, OwnableUpgradeable {
     EvaluationStatus public evaluationStatus;
@@ -20,12 +22,18 @@ contract SimplePeerEvaluation is IEvaluate, OwnableUpgradeable {
         _disableInitializers();
     }
 
+    /// @inheritdoc IWERKStrategy
     function setUp(bytes memory _initializationParams) public virtual initializer {
         (address _owner) = abi.decode(_initializationParams, (address));
 
         __Ownable_init(_owner);
     }
 
+    /// @notice The SimplePeerEvaluation strategy expect an array of addresses and an array of uint256 ratings.
+    /// the length of the two arrays must be the same and the total of the ratings must be 100.
+    /// To encode the data, use abi.encode([address1,..., addressN], [rating1,..., ratingN]).
+    /// The function reverts if the user tries to evaluate themselves.
+    /// @inheritdoc IEvaluate
     function submit(bytes memory _evaluationData) external {
         (address[] memory _contributors, uint256[] memory _ratings) =
             abi.decode(_evaluationData, (address[], uint256[]));
@@ -50,17 +58,20 @@ contract SimplePeerEvaluation is IEvaluate, OwnableUpgradeable {
         emit EvaluationSubmitted(msg.sender, _evaluationData);
     }
 
+    /// @inheritdoc IEvaluate
     function updateEvaluationStatus(EvaluationStatus _status) external onlyOwner {
         evaluationStatus = _status;
         emit EvaluationStatusUpdated(_status);
     }
 
-    function getEvaluationStatus() external view returns (EvaluationStatus) {
-        return evaluationStatus;
+    /// @inheritdoc IEvaluate
+    function getEvaluationStatus() external view returns (EvaluationStatus status) {
+        status = evaluationStatus;
     }
 
-    function getEvaluationData(address _user) external view returns (bytes memory) {
-        return evaluationData[_user];
+    /// @notice This function is specific to the SimplePeerEvaluation strategy and returns the evaluation data of a user
+    function getEvaluationData(address _user) external view returns (bytes memory data) {
+        data = evaluationData[_user];
     }
 
     /**
@@ -82,11 +93,13 @@ contract SimplePeerEvaluation is IEvaluate, OwnableUpgradeable {
         }
     }
 
-    function getStrategyType() external pure returns (StrategyTypes) {
-        return StrategyTypes.Evaluate;
+    /// @inheritdoc IWERKStrategy
+    function getStrategyType() external pure returns (StrategyTypes strategyType) {
+        strategyType = StrategyTypes.Evaluate;
     }
 
-    function supportsInterface(bytes4 interfaceId) public pure returns (bool) {
-        return interfaceId == type(IEvaluate).interfaceId;
+    /// @inheritdoc IERC165
+    function supportsInterface(bytes4 interfaceId) public pure returns (bool supported) {
+        supported = interfaceId == type(IEvaluate).interfaceId;
     }
 }

@@ -12,6 +12,8 @@ import { AcceptedToken } from "../../libraries/Structs.sol";
 import { IERC6551Executable } from "../../interfaces/IERC6551Executable.sol";
 
 import { StrategyTypes } from "../../libraries/Enums.sol";
+import { IWERKStrategy } from "../../interfaces/IWERKStrategy.sol";
+import { IERC165 } from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 
 contract DirectDeposit is IFund, OwnableUpgradeable {
     address public treasury;
@@ -22,6 +24,7 @@ contract DirectDeposit is IFund, OwnableUpgradeable {
         _disableInitializers();
     }
 
+    /// @inheritdoc IWERKStrategy
     function setUp(bytes memory _initializationParams) public virtual initializer {
         (address _owner, address _treasury) = abi.decode(_initializationParams, (address, address));
 
@@ -29,6 +32,7 @@ contract DirectDeposit is IFund, OwnableUpgradeable {
         __Ownable_init(_owner);
     }
 
+    /// @inheritdoc IFund
     function setAcceptedTokens(AcceptedToken[] memory _acceptedTokens, bool accepted) external override onlyOwner {
         for (uint256 i = 0; i < _acceptedTokens.length; i++) {
             acceptedTokens[_acceptedTokens[i].tokenAddress][_acceptedTokens[i].tokenId] = accepted;
@@ -37,6 +41,8 @@ contract DirectDeposit is IFund, OwnableUpgradeable {
         emit AcceptedTokensUpdated(_acceptedTokens, accepted);
     }
 
+    /// @notice The DirectDeposit strategy allows users to deposit funds directly into the treasury.
+    /// @inheritdoc IFund
     function deposit(
         address user,
         address tokenAddress,
@@ -66,6 +72,8 @@ contract DirectDeposit is IFund, OwnableUpgradeable {
         emit FundsDeposited(user, tokenAddress, tokenId, tokenAmount);
     }
 
+    /// @notice The DirectDeposit strategy allows the owner to withdraw funds from the treasury.
+    /// @inheritdoc IFund
     function withdraw(
         address user,
         address tokenAddress,
@@ -89,14 +97,17 @@ contract DirectDeposit is IFund, OwnableUpgradeable {
         emit FundsWithdrawn(user, tokenAddress, tokenId, tokenAmount);
     }
 
+    /// @inheritdoc IFund
     function isAcceptedToken(address tokenAddress, uint256 tokenId) external view override returns (bool) {
         return acceptedTokens[tokenAddress][tokenId];
     }
 
+    /// @inheritdoc IWERKStrategy
     function getStrategyType() external pure returns (StrategyTypes) {
         return StrategyTypes.Fund;
     }
 
+    /// @inheritdoc IERC165
     function supportsInterface(bytes4 interfaceId) public view override returns (bool) {
         return interfaceId == type(IFund).interfaceId;
     }

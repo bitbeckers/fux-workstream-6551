@@ -8,13 +8,16 @@ import { ERC721Pausable } from "@openzeppelin/contracts/token/ERC721/extensions/
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { ERC721Burnable } from "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 import { IERC6551Registry } from "./interfaces/IERC6551Registry.sol";
-import { IWERK } from "./interfaces/IWERK.sol";
 import { IWERKFactory } from "./interfaces/IWERKFactory.sol";
 
 interface IAccountProxy {
     function initialize(address implementation) external;
 }
 
+/// @title WERK NFT
+/// @notice The WERK NFT contract. When a workstream is minted, the contract creates a new account and a new WERK
+/// instance.
+/// @dev A clone of
 contract WERKNFT is ERC721, ERC721Enumerable, ERC721URIStorage, ERC721Pausable, Ownable, ERC721Burnable {
     // https://docs.tokenbound.org/contracts/deployments
     address public constant ACCOUNT_REGISTRY = 0x000000006551c19487814612e58FE06813775758;
@@ -22,30 +25,40 @@ contract WERKNFT is ERC721, ERC721Enumerable, ERC721URIStorage, ERC721Pausable, 
     address public constant ACCOUNT_IMPLEMENTATION = 0x41C8f39463A868d3A88af00cd0fe7102F30E44eC;
     address public immutable werkFactory;
 
+    /// @dev Stores the next token ID.
     uint256 private _nextTokenId;
 
-    // struct WerkInfo {
-    //     address owner;
-    //     bytes32 coordinationStrategyId;
-    //     bytes32 commitmentStrategyId;
-    //     bytes32 evaluationStrategyId;
-    //     bytes32 fundingStrategyId;
-    //     WorkstreamStatus status;
-    // }
-    mapping(uint256 tokenId => IWERK.WerkInfo workstream) public workstreams;
+    /// @dev Maps token IDs to workstream instances.
+    mapping(uint256 tokenId => address instance) public workstreams;
 
+    /// @notice Creates a new instance of WERKNFT.
+    /// @param _initialOwner The initial owner of the contract.
+    /// @param _werkFactory The address of the werkFactory contract.
     constructor(address _initialOwner, address _werkFactory) ERC721("WERK", "WRK") Ownable(_initialOwner) {
         werkFactory = _werkFactory;
     }
 
+    /// @notice Pauses targeted functions of the contract.
     function pause() public onlyOwner {
         _pause();
     }
 
+    /// @notice Unpauses targeted functions of the contract.
     function unpause() public onlyOwner {
         _unpause();
     }
 
+    /// @notice Mints a new workstream.
+    /// @param to The address of the recipient of the workstream.
+    /// @param uri The URI of the workstream.
+    /// @param coordinationStrategyId The ID of the coordination strategy.
+    /// @param commitmentStrategyId The ID of the commitment strategy.
+    /// @param evaluationStrategyId The ID of the evaluation strategy.
+    /// @param fundingStrategyId The ID of the funding strategy.
+    /// @param payoutStrategyId The ID of the payout strategy.
+    /// @return account The address of the account bound to the NFT.
+    /// @return werkInstance The address of the werkInstance owned by the account.
+    /// @return tokenId The token ID of the minted NFT.
     function mintWorkstream(
         address to,
         string memory uri,
@@ -56,7 +69,8 @@ contract WERKNFT is ERC721, ERC721Enumerable, ERC721URIStorage, ERC721Pausable, 
         bytes32 payoutStrategyId
     )
         public
-        returns (address account, uint256 tokenId)
+        whenNotPaused
+        returns (address account, address werkInstance, uint256 tokenId)
     {
         uint256 salt = 1_234_567_890; // hard code saltNonce for now
         tokenId = _nextTokenId++;
@@ -66,26 +80,27 @@ contract WERKNFT is ERC721, ERC721Enumerable, ERC721URIStorage, ERC721Pausable, 
 
         IAccountProxy(account).initialize(ACCOUNT_IMPLEMENTATION);
 
-        // _initializationParams = abi.encode(
-        // address _owner,
-        // bytes32 _coordinationStrategyId,
-        // bytes32 _commitmentStrategyId,
-        // bytes32 _evaluationStrategyId,
-        // bytes32 _fundingStrategyId,
-        // bytes32 _payoutStrategyId
-        // )
         bytes memory initializationParameters = abi.encode(
-            to, coordinationStrategyId, commitmentStrategyId, evaluationStrategyId, fundingStrategyId, payoutStrategyId
+            account,
+            tokenId,
+            coordinationStrategyId,
+            commitmentStrategyId,
+            evaluationStrategyId,
+            fundingStrategyId,
+            payoutStrategyId
         );
 
-        address werkInstance = IWERKFactory(werkFactory).createWerkInstance(initializationParameters);
+        werkInstance = IWERKFactory(werkFactory).createWerkInstance(initializationParameters);
 
-        _safeMint(msg.sender, tokenId);
+        _safeMint(to, tokenId);
         _setTokenURI(tokenId, uri);
 
-        emit IWERK.WorkstreamCreated(account, werkInstance, tokenId);
+        workstreams[tokenId] = werkInstance;
     }
 
+    /// @notice Updates the metadata of a workstream.
+    /// @param tokenId The token ID of the workstream.
+    /// @param uri The new URI of the workstream.
     function updateWorkstreamMetadata(uint256 tokenId, string memory uri) public {
         if (msg.sender != ownerOf(tokenId) || _isAuthorized(ownerOf(tokenId), msg.sender, tokenId)) {
             revert ERC721InvalidOperator(msg.sender);
@@ -111,10 +126,12 @@ contract WERKNFT is ERC721, ERC721Enumerable, ERC721URIStorage, ERC721Pausable, 
         super._increaseBalance(account, value);
     }
 
+    /// @inheritdoc ERC721
     function tokenURI(uint256 tokenId) public view override(ERC721, ERC721URIStorage) returns (string memory) {
         return super.tokenURI(tokenId);
     }
 
+    /// @inheritdoc ERC721
     function supportsInterface(bytes4 interfaceId)
         public
         view

@@ -21,6 +21,9 @@ import { MockCommit } from "./mocks/MockCommit.sol";
 import { MockCoordinate } from "./mocks/MockCoordinate.sol";
 import { MockEvaluate } from "./mocks/MockEvaluate.sol";
 
+import { WerkInfo } from "../src/WERK/libraries/Structs.sol";
+import { WorkstreamStatus } from "../src/WERK/libraries/Enums.sol";
+
 contract WERKImplementationTest is Setup {
     WERKImplementation public _werkImplementation;
 
@@ -73,7 +76,7 @@ contract WERKImplementationTest is Setup {
         vm.expectRevert();
         _werkImplementation.setUp(_initializationParams);
 
-        IWERK.WerkInfo memory werkInfo = _werkImplementation.getWerkInfo();
+        WerkInfo memory werkInfo = _werkImplementation.getWerkInfo();
 
         assertEq(werkInfo.commitmentStrategy, address(_commitmentStrategy));
         assertEq(werkInfo.coordinationStrategy, address(_coordinationStrategy));
@@ -100,7 +103,7 @@ contract WERKImplementationTest is Setup {
         vm.expectRevert();
         _werkImplementation.setUp(_initializationParams);
 
-        IWERK.WerkInfo memory werkInfo = _werkImplementation.getWerkInfo();
+        WerkInfo memory werkInfo = _werkImplementation.getWerkInfo();
 
         assertEq(werkInfo.commitmentStrategy, address(_commitmentStrategy));
         assertEq(werkInfo.coordinationStrategy, address(0));
@@ -109,7 +112,7 @@ contract WERKImplementationTest is Setup {
         assertEq(werkInfo.payoutStrategy, address(_payoutStrategy));
 
         vm.startPrank(owner);
-        _werkImplementation.updateWorkstreamStatus(IWERK.WorkstreamStatus.Active);
+        _werkImplementation.updateWorkstreamStatus(WorkstreamStatus.Active);
 
         vm.expectRevert(NotAllowedOrApproved.selector);
         _werkImplementation.coordinate("");
@@ -192,6 +195,6 @@ contract WERKImplementationTest is Setup {
         initWorkstream();
 
         vm.prank(owner);
-        _werkImplementation.updateWorkstreamStatus(IWERK.WorkstreamStatus.Active);
+        _werkImplementation.updateWorkstreamStatus(WorkstreamStatus.Active);
     }
 }

@@ -39,6 +39,6 @@ interface IEvaluate is IWERKStrategy {
     function updateEvaluationStatus(EvaluationStatus _status) external;
 
     /// @notice Gets the current status of an evaluation.
-    /// @return The current status of the evaluation.
-    function getEvaluationStatus() external view returns (EvaluationStatus);
+    /// @return status The current status of the evaluation.
+    function getEvaluationStatus() external view returns (EvaluationStatus status);
 }

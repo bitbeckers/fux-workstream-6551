@@ -11,7 +11,11 @@ import { DelegateCallFailed } from "../../libraries/Errors.sol";
 import { IERC6551Executable } from "../../interfaces/IERC6551Executable.sol";
 
 import { StrategyTypes } from "../../libraries/Enums.sol";
+import { IWERKStrategy } from "../../interfaces/IWERKStrategy.sol";
+import { IERC165 } from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 
+/// @title SimpleDistribution
+/// @dev This contract allows users to distribute tokens to multiple recipients.
 contract SimpleDistribution is IDistribute, OwnableUpgradeable {
     address internal treasury;
 
@@ -20,6 +24,7 @@ contract SimpleDistribution is IDistribute, OwnableUpgradeable {
         _disableInitializers();
     }
 
+    /// @inheritdoc IWERKStrategy
     function setUp(bytes memory _initializationParams) public virtual initializer {
         (address _owner, address _treasury) = abi.decode(_initializationParams, (address, address));
 
@@ -27,6 +32,11 @@ contract SimpleDistribution is IDistribute, OwnableUpgradeable {
         __Ownable_init(_owner);
     }
 
+    /// @notice Distributes tokens to multiple recipients. The function expects an array of addresses, an array of token
+    /// addresses, an array of token IDs, and an array of token amounts. The function reverts if the length of the
+    /// arrays
+    /// is not the same.
+    /// @inheritdoc IDistribute
     function distribute(bytes memory payoutData) external payable onlyOwner {
         (address[] memory recipients, address[] memory tokens, uint256[] memory tokenIds, uint256[] memory amounts) =
             abi.decode(payoutData, (address[], address[], uint256[], uint256[]));
@@ -50,10 +60,12 @@ contract SimpleDistribution is IDistribute, OwnableUpgradeable {
         emit Distributed(msg.sender, payoutData);
     }
 
+    /// @inheritdoc IWERKStrategy
     function getStrategyType() external pure returns (StrategyTypes) {
         return StrategyTypes.Payout;
     }
 
+    /// @inheritdoc IERC165
     function supportsInterface(bytes4 interfaceId) public pure returns (bool) {
         return interfaceId == type(IDistribute).interfaceId;
     }

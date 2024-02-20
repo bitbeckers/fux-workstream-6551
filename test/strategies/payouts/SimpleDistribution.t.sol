@@ -11,6 +11,7 @@ import { CallFailed, UnsupportedToken } from "../../../src/WERK/libraries/Errors
 
 import { IDistribute } from "../../../src/WERK/interfaces/IDistribute.sol";
 import { AcceptedToken } from "../../../src/WERK/libraries/Structs.sol";
+import { TokenType } from "../../../src/WERK/libraries/Enums.sol";
 
 import { MockExecutableCall } from "../../mocks/MockExecutableCall.sol";
 
@@ -60,7 +61,7 @@ contract SimpleDistributionTest is Setup {
         bytes memory _distributionData = abi.encode(_recipients, _tokens, _tokenIds, _amounts);
 
         AcceptedToken[] memory _acceptedTokens = new AcceptedToken[](1);
-        _acceptedTokens[0] = AcceptedToken(address(0), 0);
+        _acceptedTokens[0] = AcceptedToken(TokenType.NATIVE, address(0), 0);
 
         vm.prank(owner);
         _simpleDistribution.distribute(_distributionData);

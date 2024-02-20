@@ -2,36 +2,37 @@
 pragma solidity ^0.8.23;
 
 import { IWERK } from "./interfaces/IWERK.sol";
-import { IStrategyRegistry } from "./interfaces/IStrategyRegistry.sol";
-import { IWERKStrategy } from "./interfaces/IWERKStrategy.sol";
 import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
-import { StrategyTypes } from "./libraries/Enums.sol";
-
-import { AcceptedToken, Commitment } from "./libraries/Structs.sol";
 import { CallFailed, NotAllowedOrApproved } from "./libraries/Errors.sol";
+import { WorkstreamStatus, WerkInfo } from "./libraries/Structs.sol";
 
+/// @title WERKImplementation
+/// @dev This contract implements the WERK interface and allows the owner to coordinate, commit, evaluate, fund, and
+/// distribute work.
 contract WERKImplementation is IWERK, OwnableUpgradeable {
+    /// @dev The address of the commitment strategy.
     address internal commitmentStrategy;
+    /// @dev The address of the coordination strategy.
     address internal coordinationStrategy;
+    /// @dev The address of the evaluation strategy.
     address internal evaluationStrategy;
+    /// @dev The address of the funding strategy.
     address internal fundingStrategy;
+    /// @dev The address of the payout strategy.
     address internal payoutStrategy;
+    /// @dev The status of the workstream.
     WorkstreamStatus internal status;
 
-    /// @custom:oz-upgrades-unsafe-allow constructor
+    /// @dev Disables the initializers as this contract will be cloned per instance.
     constructor() {
         _disableInitializers();
     }
 
-    // _initializationParams = abi.encode(
-    // address _owner,
-    // address _commitmentStrategy,
-    // address _coordinationStrategy,
-    // address _evaluationStrategy,
-    // address _fundingStrategy,
-    // address _payoutStrategy
-    // )
+    /// @notice Sets up the contract.
+    /// @dev This function is called only once, during the contract deployment.
+    /// @param _initializationParams The initialization parameters, encoded as bytes. These parameters are decoded into
+    /// the owner address and the addresses of the five strategies.
     function setUp(bytes memory _initializationParams) public virtual initializer {
         (
             address _owner,
@@ -51,7 +52,9 @@ contract WERKImplementation is IWERK, OwnableUpgradeable {
         __Ownable_init(_owner);
     }
 
-    // TODO validations on strategy types and supported interfaces
+    /// @notice Can only be called by the contract owner and if the workstream status is active. If the coordination
+    /// strategy is not set, the function reverts.
+    /// @inheritdoc IWERK
     function coordinate(bytes memory coordinationCallData) external override onlyOwner {
         if (status != WorkstreamStatus.Active) revert WorkstreamNotActive();
         if (coordinationStrategy == address(0)) revert NotAllowedOrApproved();
@@ -61,6 +64,9 @@ contract WERKImplementation is IWERK, OwnableUpgradeable {
         if (!success) revert CallFailed(returnData);
     }
 
+    /// @notice  Can only be called by the contract owner and if the workstream status is active. If the commitment
+    /// strategy is not set, the function reverts.
+    /// @inheritdoc IWERK
     function commit(bytes memory commitmentCallData) external override onlyOwner {
         if (status != WorkstreamStatus.Active) revert WorkstreamNotActive();
         if (commitmentStrategy == address(0)) revert NotAllowedOrApproved();
@@ -70,6 +76,9 @@ contract WERKImplementation is IWERK, OwnableUpgradeable {
         if (!success) revert CallFailed(returnData);
     }
 
+    /// @notice Can only be called by the contract owner and if the workstream status is active. If the evaluation
+    /// strategy is not set, the function reverts.
+    /// @inheritdoc IWERK
     function evaluate(bytes memory evaluationCallData) external override onlyOwner {
         if (status != WorkstreamStatus.Active) revert WorkstreamNotActive();
         if (evaluationStrategy == address(0)) revert NotAllowedOrApproved();
@@ -79,6 +88,9 @@ contract WERKImplementation is IWERK, OwnableUpgradeable {
         if (!success) revert CallFailed(returnData);
     }
 
+    /// @notice Can only be called by the contract owner and if the workstream status is active. If the funding strategy
+    /// is not set, the function reverts.
+    /// @inheritdoc IWERK
     function fund(bytes memory fundingCallData) external override onlyOwner {
         if (status != WorkstreamStatus.Active) revert WorkstreamNotActive();
         if (fundingStrategy == address(0)) revert NotAllowedOrApproved();
@@ -88,6 +100,9 @@ contract WERKImplementation is IWERK, OwnableUpgradeable {
         if (!success) revert CallFailed(returnData);
     }
 
+    /// @notice Can only be called by the contract owner and if the workstream status is active. If the payout strategy
+    /// is not set, the function reverts.
+    /// @inheritdoc IWERK
     function distribute(bytes memory distributionCallData) external override onlyOwner {
         if (status != WorkstreamStatus.Active) revert WorkstreamNotActive();
         if (payoutStrategy == address(0)) revert NotAllowedOrApproved();
@@ -97,6 +112,9 @@ contract WERKImplementation is IWERK, OwnableUpgradeable {
         if (!success) revert CallFailed(returnData);
     }
 
+    /// @notice  Can only be called by the contract owner. This function is potentially unsafe as it can call any
+    /// contract including malicious ones.
+    /// @inheritdoc IWERK
     function unsafeExecute(bytes memory _callData, address _target) external onlyOwner {
         (bool success, bytes memory returnData) = _target.call(_callData);
 
@@ -105,8 +123,9 @@ contract WERKImplementation is IWERK, OwnableUpgradeable {
 
     // WERK
 
-    function getWerkInfo() external view returns (WerkInfo memory werk) {
-        return WerkInfo({
+    /// @inheritdoc IWERK
+    function getWerkInfo() external view returns (WerkInfo memory werkInfo) {
+        werkInfo = WerkInfo({
             owner: owner(),
             coordinationStrategy: coordinationStrategy,
             commitmentStrategy: commitmentStrategy,
@@ -117,6 +136,8 @@ contract WERKImplementation is IWERK, OwnableUpgradeable {
         });
     }
 
+    /// @notice  Can only be called by the contract owner.
+    /// @inheritdoc IWERK
     function updateWorkstreamStatus(WorkstreamStatus _status) external override onlyOwner {
         status = _status;
         emit WorkstreamStatusUpdated(msg.sender, owner(), _status);
