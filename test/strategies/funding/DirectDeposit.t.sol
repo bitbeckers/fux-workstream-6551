@@ -25,6 +25,8 @@ contract DirectDepositTest is Setup {
 
         bytes memory _initializationParams = abi.encode(owner, address(_mockExecutableCall));
         _directDeposit = DirectDeposit(getClone(address(directDeposit)));
+
+        vm.prank(owner);
         _directDeposit.setUp(_initializationParams);
 
         vm.deal(workstreamAccount, 10 ether);

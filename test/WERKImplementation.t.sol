@@ -40,6 +40,7 @@ contract WERKImplementationTest is Setup {
         _werkImplementation = WERKImplementation(getClone(address(werkImplementation)));
 
         bytes memory _initializationParams = abi.encode(owner);
+        vm.startPrank(owner);
         _commitmentStrategy = ICommit(address(new MockCommit()));
         _commitmentStrategy.setUp(_initializationParams);
 
@@ -56,6 +57,7 @@ contract WERKImplementationTest is Setup {
 
         _payoutStrategy = IDistribute(getClone(address(simpleDistribution)));
         _payoutStrategy.setUp(_initializationParams);
+        vm.stopPrank();
     }
 
     function testCanInitializeWithStrategies() public {
@@ -68,6 +70,7 @@ contract WERKImplementationTest is Setup {
             address(_payoutStrategy)
         );
 
+        vm.prank(owner);
         _werkImplementation.setUp(_initializationParams);
 
         assertEq(_werkImplementation.owner(), owner);
@@ -95,11 +98,11 @@ contract WERKImplementationTest is Setup {
             address(_payoutStrategy)
         );
 
+        vm.startPrank(owner);
         _werkImplementation.setUp(_initializationParams);
 
         assertEq(_werkImplementation.owner(), owner);
 
-        vm.prank(owner);
         vm.expectRevert();
         _werkImplementation.setUp(_initializationParams);
 
@@ -111,7 +114,6 @@ contract WERKImplementationTest is Setup {
         assertEq(werkInfo.fundingStrategy, address(_fundingStrategy));
         assertEq(werkInfo.payoutStrategy, address(_payoutStrategy));
 
-        vm.startPrank(owner);
         _werkImplementation.updateWorkstreamStatus(WorkstreamStatus.Active);
 
         vm.expectRevert(NotAllowedOrApproved.selector);
@@ -166,14 +168,14 @@ contract WERKImplementationTest is Setup {
         initActiveWorkstream();
 
         assertEq(_werkImplementation.owner(), owner);
-        bytes memory callData = abi.encodeWithSelector(ICommit.commit.selector, "");
+        bytes memory callData = abi.encodeWithSelector(ICommit.commit.selector, address(42), address(0), 1, 1 ether);
 
-        vm.prank(anon);
         vm.expectRevert();
+        vm.prank(anon);
         _werkImplementation.commit(callData);
 
         vm.expectEmit();
-        emit ICommit.UserCommitted(address(_werkImplementation), owner, address(0), 0, 0);
+        emit ICommit.UserCommitted(address(42), address(42), address(0), 1, 1 ether);
         vm.prank(owner);
         _werkImplementation.commit(callData);
     }
@@ -188,6 +190,7 @@ contract WERKImplementationTest is Setup {
             address(_payoutStrategy)
         );
 
+        vm.prank(owner);
         _werkImplementation.setUp(_initializationParams);
     }
 

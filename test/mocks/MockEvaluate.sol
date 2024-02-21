@@ -11,7 +11,7 @@ contract MockEvaluate is IEvaluate, OwnableUpgradeable {
     function setUp(bytes memory _initializationParams) external initializer {
         (address _owner) = abi.decode(_initializationParams, (address));
 
-        __Ownable_init(_owner);
+        __Ownable_init();
     }
 
     function getStrategyType() external view returns (StrategyTypes strategyType) {

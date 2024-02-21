@@ -9,7 +9,6 @@ import { IERC165 } from "@openzeppelin/contracts/utils/introspection/IERC165.sol
  * @dev Interface for the WERK strategy contract.
  */
 interface IWERKStrategy is IERC165 {
-
     /// @notice Sets up the strategy. Required parameters can change per strategy.
     function setUp(bytes memory _initializationParams) external;
 

@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/token/ERC1155/extensions/IERC1155MetadataURI.sol
 interface IFUX is IFUXable {
     error NotAllowed();
     error UserAlreadyCreated();
+    error UnsupportedWorkstream();
 
     /**
      * @dev This event is emitted when a new FUX SBT is minted

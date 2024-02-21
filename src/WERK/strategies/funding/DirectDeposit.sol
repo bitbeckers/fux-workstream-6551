@@ -29,7 +29,7 @@ contract DirectDeposit is IFund, OwnableUpgradeable {
         (address _owner, address _treasury) = abi.decode(_initializationParams, (address, address));
 
         treasury = _treasury;
-        __Ownable_init(_owner);
+        __Ownable_init();
     }
 
     /// @inheritdoc IFund

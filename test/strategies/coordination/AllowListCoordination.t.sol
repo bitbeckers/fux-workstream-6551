@@ -17,6 +17,7 @@ contract AllowListCoordinationTest is Setup {
         bytes memory _initializationParams = abi.encode(workstreamAccount);
         _allowListCoordination = AllowListCoordination(getClone(address(allowListCoordination)));
 
+        vm.prank(owner);
         AllowListCoordination(_allowListCoordination).setUp(_initializationParams);
     }
 

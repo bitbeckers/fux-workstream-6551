@@ -19,6 +19,7 @@ contract FuxStakingTest is Setup {
         bytes memory _initializationParams = abi.encode(workstreamAccount);
         _fuxStaking = FUXStaking(getClone(address(fuxStaking)));
 
+        vm.prank(owner);
         FUXStaking(_fuxStaking).setUp(_initializationParams);
     }
 

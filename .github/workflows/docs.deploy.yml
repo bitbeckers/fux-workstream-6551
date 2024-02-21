@@ -1,0 +1,52 @@
+name: Build Book & Deploy to Vercel
+
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  buildAndDeploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # To push a branch
+      pull-requests: write # To create a PR from that branch
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Setup Node.js (required to install Vercel CLI)
+        uses: actions/setup-node@v3
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+
+      - name: Run Forge doc
+        run: forge doc -b
+        id: generate-docs
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel
+
+      - name: Pull Vercel environment information
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: List files
+        run: |
+          ls -la
+
+      - name: List files in docs
+        working-directory: docs
+        run: |
+          ls -la
+
+      - name: Deploy to Vercel
+        run: vercel --cwd docs book --prod --token=${{ secrets.VERCEL_TOKEN }}

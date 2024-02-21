@@ -26,7 +26,7 @@ contract SimplePeerEvaluation is IEvaluate, OwnableUpgradeable {
     function setUp(bytes memory _initializationParams) public virtual initializer {
         (address _owner) = abi.decode(_initializationParams, (address));
 
-        __Ownable_init(_owner);
+        __Ownable_init();
     }
 
     /// @notice The SimplePeerEvaluation strategy expect an array of addresses and an array of uint256 ratings.

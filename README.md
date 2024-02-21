@@ -28,78 +28,14 @@ A Foundry-based template for developing Solidity smart contracts, with sensible 
 | DirectDeposit         | [0xDc989980807f59155de9d6776025228856742E23](https://sepolia.etherscan.io/address/0xDc989980807f59155de9d6776025228856742E23) |
 | SimpleDistribution    | [0x9D1501F75f733D4763ce2886Dbc96883F4EB867e](https://sepolia.etherscan.io/address/0x9D1501F75f733D4763ce2886Dbc96883F4EB867e) |
 
-IDs in registry:
 
-bytes32 fuxStakingId = 0x6b8751b8367be0bc1384cce56ff51454f781964e1c715825901b363d506b3bcd; bytes32 allowListId =
-0xe6bd3e801e71e9e619dfe1e2e91c4d171fc8a6eaa81555c12619e8683b0d33b1; bytes32 peerEvaluationId =
-0xf78fdd634cce0d68228ce09dc7681e20a9d39df11b51c5265fca401ed315c83c; bytes32 directDepositId =
-0x7b26ece6b81f2b8ab0f5b0f95284bbfe16c9d28709264d97553d58c85cf32a30; bytes32 simpleDistributionId =
-0xd8afd210eaa5981adc1e9a7771be634fa551d224849313cc5572351b1a273069;
-
-## What's Inside
-
-- [Forge](https://github.com/foundry-rs/foundry/blob/master/forge): compile, test, fuzz, format, and deploy smart
-  contracts
-- [Forge Std](https://github.com/foundry-rs/forge-std): collection of helpful contracts and cheatcodes for testing
-- [PRBTest](https://github.com/PaulRBerg/prb-test): modern collection of testing assertions and logging utilities
-- [Prettier](https://github.com/prettier/prettier): code formatter for non-Solidity files
-- [Solhint](https://github.com/protofire/solhint): linter for Solidity code
-
-## Getting Started
-
-Click the [`Use this template`](https://github.com/PaulRBerg/foundry-template/generate) button at the top of the page to
-create a new repository with this repo as the initial state.
-
-Or, if you prefer to install the template manually:
-
-```sh
-$ mkdir my-project
-$ cd my-project
-$ forge init --template PaulRBerg/foundry-template
-$ bun install # install Solhint, Prettier, and other Node.js deps
-```
-
-If this is your first time with Foundry, check out the
-[installation](https://github.com/foundry-rs/foundry#installation) instructions.
-
-## Features
-
-This template builds upon the frameworks and libraries mentioned above, so please consult their respective documentation
-for details about their specific features.
-
-For example, if you're interested in exploring Foundry in more detail, you should look at the
-[Foundry Book](https://book.getfoundry.sh/). In particular, you may be interested in reading the
-[Writing Tests](https://book.getfoundry.sh/forge/writing-tests.html) tutorial.
-
-### Sensible Defaults
-
-This template comes with a set of sensible default configurations for you to use. These defaults can be found in the
-following files:
-
-```text
-├── .editorconfig
-├── .gitignore
-├── .prettierignore
-├── .prettierrc.yml
-├── .solhint.json
-├── foundry.toml
-└── remappings.txt
-```
-
-### VSCode Integration
-
-This template is IDE agnostic, but for the best user experience, you may want to use it in VSCode alongside Nomic
-Foundation's [Solidity extension](https://marketplace.visualstudio.com/items?itemName=NomicFoundation.hardhat-solidity).
-
-For guidance on how to integrate a Foundry project in VSCode, please refer to this
-[guide](https://book.getfoundry.sh/config/vscode).
-
-### GitHub Actions
-
-This template comes with GitHub Actions pre-configured. Your contracts will be linted and tested on every push and pull
-request made to the `main` branch.
-
-You can edit the CI script in [.github/workflows/ci.yml](./.github/workflows/ci.yml).
+| Strategy             | StrategyID                                                         |
+| -------------------- | ------------------------------------------------------------------ |
+| fuxStakingId         | 0x6b8751b8367be0bc1384cce56ff51454f781964e1c715825901b363d506b3bcd |
+| allowListId          | 0xe6bd3e801e71e9e619dfe1e2e91c4d171fc8a6eaa81555c12619e8683b0d33b1 |
+| peerEvaluationId     | 0xf78fdd634cce0d68228ce09dc7681e20a9d39df11b51c5265fca401ed315c83c |
+| directDepositId      | 0x7b26ece6b81f2b8ab0f5b0f95284bbfe16c9d28709264d97553d58c85cf32a30 |
+| simpleDistributionId | 0xd8afd210eaa5981adc1e9a7771be634fa551d224849313cc5572351b1a273069 |
 
 ## Installing Dependencies
 
@@ -114,15 +50,6 @@ This is how to install dependencies:
    `dependency-name=node_modules/dependency-name`
 
 Note that OpenZeppelin Contracts is pre-installed, so you can follow that as an example.
-
-## Writing Tests
-
-To write a new test contract, you start by importing [PRBTest](https://github.com/PaulRBerg/prb-test) and inherit from
-it in your test contract. PRBTest comes with a pre-instantiated [cheatcodes](https://book.getfoundry.sh/cheatcodes/)
-environment accessible via the `vm` property. If you would like to view the logs in the terminal output you can add the
-`-vvv` flag and use [console.log](https://book.getfoundry.sh/faq?highlight=console.log#how-do-i-use-consolelog).
-
-This template comes with an example test contract [Foo.t.sol](./test/Foo.t.sol)
 
 ## Usage
 
@@ -218,13 +145,6 @@ simply copy paste the path):
 ```sh
 $ bun run test:coverage:report
 ```
-
-## Related Efforts
-
-- [abigger87/femplate](https://github.com/abigger87/femplate)
-- [cleanunicorn/ethereum-smartcontract-template](https://github.com/cleanunicorn/ethereum-smartcontract-template)
-- [foundry-rs/forge-template](https://github.com/foundry-rs/forge-template)
-- [FrankieIsLost/forge-template](https://github.com/FrankieIsLost/forge-template)
 
 ## License
 

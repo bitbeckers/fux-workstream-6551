@@ -13,14 +13,6 @@ contract StrategyRegistryTest is Setup {
         super.setup();
     }
 
-    // enum StrategyTypes {
-    //     Coordinate,
-    //     Commit,
-    //     Fund,
-    //     Evaluate,
-    //     Payout
-    // }
-
     function testCanCreateStrategy() public {
         StrategyTypes strategyType = StrategyTypes.Commit;
         address implementation = address(fuxStaking);

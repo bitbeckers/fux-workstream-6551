@@ -40,6 +40,7 @@ contract Setup is PRBTest, StdCheats {
     function setup() internal virtual {
         fux = new FUX(owner);
         fuxStaking = new FUXStaking(address(fux));
+        vm.prank(owner);
         strategyRegistry = new StrategyRegistry(owner);
 
         allowListCoordination = new AllowListCoordination();

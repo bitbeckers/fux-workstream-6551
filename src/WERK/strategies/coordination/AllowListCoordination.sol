@@ -29,7 +29,7 @@ contract AllowListCoordination is ICoordinate, OwnableUpgradeable {
         (address _owner) = abi.decode(_initializationParams, (address));
 
         coordinators[_owner] = true;
-        __Ownable_init(_owner);
+        __Ownable_init();
     }
 
     /// @notice Adds contributors to the allow list. This method is specific to the AllowListCoordination strategy

@@ -29,6 +29,7 @@ contract SimpleDistributionTest is Setup {
         bytes memory _initializationParams = abi.encode(owner, address(_mockExecutableCall));
 
         _simpleDistribution = SimpleDistribution(getClone(address(simpleDistribution)));
+        vm.prank(owner);
         _simpleDistribution.setUp(_initializationParams);
 
         vm.deal(owner, 10 ether);

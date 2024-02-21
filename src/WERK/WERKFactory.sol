@@ -23,7 +23,7 @@ contract WERKFactory is IWERKFactory, Ownable {
     /// @param initialOwner The initial owner of the contract.
     /// @param werkImplementation The address of the initial WERK implementation.
     /// @param strategyRegistry The address of the strategy registry.
-    constructor(address initialOwner, address werkImplementation, address strategyRegistry) Ownable(initialOwner) {
+    constructor(address initialOwner, address werkImplementation, address strategyRegistry) Ownable() {
         _werkImplementation = werkImplementation;
         _strategyRegistry = strategyRegistry;
     }

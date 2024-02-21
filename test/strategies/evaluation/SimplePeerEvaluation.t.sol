@@ -21,6 +21,7 @@ contract SimplePeerEvaluationTest is Setup {
         bytes memory _initializationParams = abi.encode(workstreamAccount);
         _simplePeerEvaluation = SimplePeerEvaluation(getClone(address(simplePeerEvaluation)));
 
+        vm.prank(workstreamAccount);
         SimplePeerEvaluation(_simplePeerEvaluation).setUp(_initializationParams);
     }
 

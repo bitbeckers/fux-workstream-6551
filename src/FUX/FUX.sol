@@ -14,7 +14,7 @@ import { IERC1155Receiver } from "@openzeppelin/contracts/interfaces/IERC1155Rec
 import { IFUX } from "./interfaces/IFUX.sol";
 import { IFUXable } from "./interfaces/IFUXable.sol";
 
-contract FUX is IFUX, ERC1155, Ownable, ERC1155Pausable {
+contract FUX is IFUX, ERC1155Pausable, Ownable {
     using Strings for uint256;
 
     uint256 public constant VFUX_TOKEN_ID = 0;
@@ -30,7 +30,7 @@ contract FUX is IFUX, ERC1155, Ownable, ERC1155Pausable {
     mapping(address user => bool isFuxer) internal _isFuxer;
 
     // solhint-disable-next-line no-empty-blocks
-    constructor(address initialOwner) ERC1155("FUX") Ownable(initialOwner) { }
+    constructor(address initialOwner) ERC1155("FUX") Ownable() { }
 
     function setURI(string memory newuri) public onlyOwner {
         _setURI(newuri);
@@ -56,13 +56,17 @@ contract FUX is IFUX, ERC1155, Ownable, ERC1155Pausable {
         emit UserCreated(operator, fuxUser, sbtId);
     }
 
-    function giveFUX(address user, address workstream, uint256 amount) public isFuxable(workstream) {
+    function giveFUX(address user, address workstream, uint256 amount) public {
+        if (!supportsInterface(type(IFUXable).interfaceId)) revert UnsupportedWorkstream();
+
         safeTransferFrom(user, workstream, FUX_TOKEN_ID, amount, "");
 
         emit FUXGiven(user, workstream, amount);
     }
 
-    function takeFUX(address user, address workstream, uint256 amount) public isFuxable(workstream) {
+    function takeFUX(address user, address workstream, uint256 amount) public {
+        if (!supportsInterface(type(IFUXable).interfaceId)) revert UnsupportedWorkstream();
+
         safeTransferFrom(workstream, user, FUX_TOKEN_ID, amount, "");
 
         emit FUXTaken(user, workstream, amount);
@@ -138,20 +142,6 @@ contract FUX is IFUX, ERC1155, Ownable, ERC1155Pausable {
         );
     }
 
-    // The following functions are overrides required by Solidity.
-
-    function _update(
-        address from,
-        address to,
-        uint256[] memory ids,
-        uint256[] memory values
-    )
-        internal
-        override(ERC1155, ERC1155Pausable)
-    {
-        super._update(from, to, ids, values);
-    }
-
     // Receiver functions
 
     function onERC721Received(address, address, uint256, bytes memory) external pure returns (bytes4) {
@@ -180,8 +170,17 @@ contract FUX is IFUX, ERC1155, Ownable, ERC1155Pausable {
         return interfaceId == type(IFUXable).interfaceId || super.supportsInterface(interfaceId);
     }
 
-    modifier isFuxable(address _contract) {
-        require(IERC165(_contract).supportsInterface(type(IFUXable).interfaceId), "FUX: Not FUXable");
-        _;
+    function _beforeTokenTransfer(
+        address operator,
+        address from,
+        address to,
+        uint256[] memory ids,
+        uint256[] memory amounts,
+        bytes memory data
+    )
+        internal
+        override(ERC1155Pausable)
+    {
+        super._beforeTokenTransfer(operator, from, to, ids, amounts, data);
     }
 }

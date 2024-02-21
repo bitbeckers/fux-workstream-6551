@@ -10,7 +10,8 @@ contract MockCommit is ICommit, OwnableUpgradeable {
     function setUp(bytes memory _initializationParams) external initializer {
         (address _owner) = abi.decode(_initializationParams, (address));
 
-        __Ownable_init(_owner);
+        __Ownable_init();
+        transferOwnership(_owner);
     }
 
     function getStrategyType() external view returns (StrategyTypes strategyType) {
@@ -18,11 +19,11 @@ contract MockCommit is ICommit, OwnableUpgradeable {
     }
 
     function commit(address user, address tokenAddress, uint256 tokenId, uint256 tokenAmount) external payable {
-        emit UserCommitted(owner(), user, tokenAddress, tokenId, tokenAmount);
+        emit UserCommitted(user, user, tokenAddress, tokenId, tokenAmount);
     }
 
     function revoke(address user, address tokenAddress, uint256 tokenId, uint256 tokenAmount) external payable {
-        emit UserWithdrawn(owner(), user, tokenAddress, tokenId, tokenAmount);
+        emit UserWithdrawn(user, user, tokenAddress, tokenId, tokenAmount);
     }
 
     function getCommitments(address user) external view returns (Commitment[] memory commitments) {

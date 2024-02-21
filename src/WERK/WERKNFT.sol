@@ -7,18 +7,16 @@ import { ERC721URIStorage } from "@openzeppelin/contracts/token/ERC721/extension
 import { ERC721Pausable } from "@openzeppelin/contracts/token/ERC721/extensions/ERC721Pausable.sol";
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { ERC721Burnable } from "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
-import { IERC6551Registry } from "./interfaces/IERC6551Registry.sol";
+import { IERC6551Registry } from "erc6551/interfaces/IERC6551Registry.sol";
 import { IWERKFactory } from "./interfaces/IWERKFactory.sol";
-
-interface IAccountProxy {
-    function initialize(address implementation) external;
-}
+import { AccountProxy } from "tokenbound/AccountProxy.sol";
+import { NotApprovedOrOwner } from "./libraries/Errors.sol";
 
 /// @title WERK NFT
 /// @notice The WERK NFT contract. When a workstream is minted, the contract creates a new account and a new WERK
 /// instance.
 /// @dev A clone of
-contract WERKNFT is ERC721, ERC721Enumerable, ERC721URIStorage, ERC721Pausable, Ownable, ERC721Burnable {
+contract WERKNFT is ERC721Enumerable, ERC721URIStorage, ERC721Pausable, ERC721Burnable, Ownable {
     // https://docs.tokenbound.org/contracts/deployments
     address public constant ACCOUNT_REGISTRY = 0x000000006551c19487814612e58FE06813775758;
     address public constant ACCOUNT_PROXY = 0x55266d75D1a14E4572138116aF39863Ed6596E7F;
@@ -34,7 +32,7 @@ contract WERKNFT is ERC721, ERC721Enumerable, ERC721URIStorage, ERC721Pausable, 
     /// @notice Creates a new instance of WERKNFT.
     /// @param _initialOwner The initial owner of the contract.
     /// @param _werkFactory The address of the werkFactory contract.
-    constructor(address _initialOwner, address _werkFactory) ERC721("WERK", "WRK") Ownable(_initialOwner) {
+    constructor(address _initialOwner, address _werkFactory) ERC721("WERK", "WRK") Ownable() {
         werkFactory = _werkFactory;
     }
 
@@ -78,7 +76,7 @@ contract WERKNFT is ERC721, ERC721Enumerable, ERC721URIStorage, ERC721Pausable, 
             ACCOUNT_PROXY, bytes32(salt), block.chainid, address(this), tokenId
         );
 
-        IAccountProxy(account).initialize(ACCOUNT_IMPLEMENTATION);
+        AccountProxy(payable(account)).initialize(ACCOUNT_IMPLEMENTATION);
 
         bytes memory initializationParameters = abi.encode(
             account,
@@ -102,29 +100,13 @@ contract WERKNFT is ERC721, ERC721Enumerable, ERC721URIStorage, ERC721Pausable, 
     /// @param tokenId The token ID of the workstream.
     /// @param uri The new URI of the workstream.
     function updateWorkstreamMetadata(uint256 tokenId, string memory uri) public {
-        if (msg.sender != ownerOf(tokenId) || _isAuthorized(ownerOf(tokenId), msg.sender, tokenId)) {
-            revert ERC721InvalidOperator(msg.sender);
+        if (ownerOf(tokenId) == address(0) || !_isApprovedOrOwner(msg.sender, tokenId)) {
+            revert NotApprovedOrOwner();
         }
         _setTokenURI(tokenId, uri);
     }
 
     // The following functions are overrides required by Solidity.
-
-    function _update(
-        address to,
-        uint256 tokenId,
-        address auth
-    )
-        internal
-        override(ERC721, ERC721Enumerable, ERC721Pausable)
-        returns (address)
-    {
-        return super._update(to, tokenId, auth);
-    }
-
-    function _increaseBalance(address account, uint128 value) internal override(ERC721, ERC721Enumerable) {
-        super._increaseBalance(account, value);
-    }
 
     /// @inheritdoc ERC721
     function tokenURI(uint256 tokenId) public view override(ERC721, ERC721URIStorage) returns (string memory) {
@@ -139,5 +121,21 @@ contract WERKNFT is ERC721, ERC721Enumerable, ERC721URIStorage, ERC721Pausable, 
         returns (bool)
     {
         return super.supportsInterface(interfaceId);
+    }
+
+    function _burn(uint256 tokenId) internal override(ERC721, ERC721URIStorage) {
+        super._burn(tokenId);
+    }
+
+    function _beforeTokenTransfer(
+        address from,
+        address to,
+        uint256 firstTokenId,
+        uint256 batchSize
+    )
+        internal
+        override(ERC721, ERC721Enumerable, ERC721Pausable)
+    {
+        super._beforeTokenTransfer(from, to, firstTokenId, batchSize);
     }
 }

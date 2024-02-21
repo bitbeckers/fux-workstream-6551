@@ -29,7 +29,7 @@ contract SimpleDistribution is IDistribute, OwnableUpgradeable {
         (address _owner, address _treasury) = abi.decode(_initializationParams, (address, address));
 
         treasury = _treasury;
-        __Ownable_init(_owner);
+        __Ownable_init();
     }
 
     /// @notice Distributes tokens to multiple recipients. The function expects an array of addresses, an array of token

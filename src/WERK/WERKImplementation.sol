@@ -49,7 +49,7 @@ contract WERKImplementation is IWERK, OwnableUpgradeable {
         fundingStrategy = _fundingStrategy;
         payoutStrategy = _payoutStrategy;
 
-        __Ownable_init(_owner);
+        __Ownable_init();
     }
 
     /// @notice Can only be called by the contract owner and if the workstream status is active. If the coordination
