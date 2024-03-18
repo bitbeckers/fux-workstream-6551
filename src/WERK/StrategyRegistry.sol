@@ -14,7 +14,9 @@ contract StrategyRegistry is IStrategyRegistry, Ownable {
 
     /// @notice Creates a new instance of StrategyRegistry.
     /// @param owner The initial owner of the contract.
-    constructor(address owner) Ownable() { }
+    constructor(address owner) Ownable() {
+        transferOwnership(owner);
+     }
 
     /// @notice Can only be called by the contract owner.
     /// @inheritdoc IStrategyRegistry

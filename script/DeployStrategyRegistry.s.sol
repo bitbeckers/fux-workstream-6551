@@ -20,10 +20,10 @@ import { StrategyTypes } from "../src/WERK/libraries/Enums.sol";
 /// @dev See the Solidity Scripting tutorial: https://book.getfoundry.sh/tutorials/solidity-scripting
 contract DeployStrategyRegistry is BaseScript {
     function run() public broadcast {
-        bytes32 _salt = keccak256("v0.6");
+        bytes32 _salt = keccak256("v0.7");
 
         // Strategies
-        FUXStaking fuxStaking = new FUXStaking{ salt: _salt }(0xDBB776B586C2254f5228dfa368F9adc8D4Dcd8f1);
+        FUXStaking fuxStaking = new FUXStaking{ salt: _salt }(0xC4AE689DFF0D3aE05E1EDc192C8ddA5104D3fEc5);
         AllowListCoordination allowListCoordination = new AllowListCoordination{ salt: _salt }();
         SimplePeerEvaluation simplePeerEvaluation = new SimplePeerEvaluation{ salt: _salt }();
         DirectDeposit directDeposit = new DirectDeposit{ salt: _salt }();
